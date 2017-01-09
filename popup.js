@@ -31,5 +31,9 @@ function get_filter_url() {
 }
 
 function print_filter_url(response) {
-	$("[name='filter-url']").val(response.filter_url);
+	if (response!=null) {
+		$("[name='filter-url']").val(response.filter_url);
+	} else {
+		$("[name='filter-url']").val("Error: Please refresh the active tab");
+	}
 }
