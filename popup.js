@@ -1,4 +1,4 @@
-$( document ).ready(function() {
+document.addEventListener( "DOMContentLoaded", function() {
 	
 	
 	//setup listener in case popup left open when results returned
@@ -8,9 +8,9 @@ $( document ).ready(function() {
 		}
 	});
 	
-	$("#refresh-filter").on("click", function () {
+	document.getElementById("refresh-filter").addEventListener("click", function () {
 		get_filter_url();
-	})
+	});
 	get_filter_url();
 });
 
@@ -32,8 +32,8 @@ function get_filter_url() {
 
 function print_filter_url(response) {
 	if (response!=null) {
-		$("[name='filter-url']").val(response.filter_url);
+		document.getElementsByName("filter-url")[0].value=response.filter_url;
 	} else {
-		$("[name='filter-url']").val("Error: Please refresh the active tab");
+		document.getElementsByName("filter-url")[0].value="Error: Please refresh the active tab";
 	}
 }

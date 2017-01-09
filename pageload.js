@@ -21,12 +21,10 @@ function generate_filter_url() {
 	var domain = window.location.hostname+window.location.pathname;
 	var filter_string = "";
 	
-	var filter_elements = $("[name*='_ftr_'],[name*='_sb_']");	
-	filter_elements.each(function(index) {
-		var filter_element = $(this);
-		filter_string=check_element_add_filter(filter_element, filter_string);
-	});
-	
+	var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
+	for (var fil_i = 0; fil_i < filter_elements.length; fil_i++) {
+		filter_string=check_element_add_filter(filter_elements[fil_i], filter_string);
+	}
 	
 	//fix ; in the url
 	filter_string = filter_string.replace(/;/g,"%3b");
@@ -37,16 +35,15 @@ function generate_filter_url() {
 function check_element_add_filter(pot_elem, start_fil_string){
 	var new_fil_string = start_fil_string;
 	
-	//check not null
-		if (pot_elem.val()!=null) {
-		
-		// check if array
-		if (pot_elem.val().constructor === Array) {
-			$.each(pot_elem.val(), function(index) {
-				new_fil_string = append_filter(new_fil_string, pot_elem.attr("name"), this);
-			});
-		} else	if (pot_elem.val() != "") {
-			new_fil_string = append_filter(new_fil_string, pot_elem.attr("name"), pot_elem.val());
+	// check for multiple type select
+	if (pot_elem.selectedOptions != null && pot_elem.multiple) {
+		for (var el_i = 0; el_i < pot_elem.selectedOptions.length; el_i++) {
+			new_fil_string = append_filter(new_fil_string, pot_elem.getAttribute("name"), pot_elem.selectedOptions[el_i].value);
+		}
+	} // else check if value exists
+	else if (pot_elem.value!=null) {
+		if (pot_elem.value != "") {
+			new_fil_string = append_filter(new_fil_string, pot_elem.getAttribute("name"), pot_elem.value);
 		}
 	}
 	return new_fil_string;
