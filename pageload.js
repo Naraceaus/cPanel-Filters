@@ -150,7 +150,9 @@ chrome.storage.sync.get(null, function(stored_options) {
 	if (stored_options["auto-repair-coupon-url"]) {
 		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"discounts","page":"view"}, ["id"]);
 	}
-});
-
-
 	
+	// refund
+	if (stored_options["auto-repair-coupon-url"]) {
+		repair_url("/_cpanel/refund", {}, ["id"]);
+	}
+});
