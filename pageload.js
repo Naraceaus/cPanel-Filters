@@ -82,6 +82,11 @@ function auto_filter_setup() {
 }
 
 function gen_repair_url(base_path, required_inputs, optional_inputs) {
+	//make sure base url matches
+	if (base_path != window.location.pathname) {
+		return null;
+	}
+	
 	requirements_met = true;
 	var repaired_url = base_path + "?";
 	
