@@ -68,3 +68,23 @@ function append_filter(original_string, filter_name, filter_value) {
 	
 	return new_string;
 }
+
+function update_window_url() {
+		window.history.replaceState("", "", generate_filter_string());
+}
+
+function setup_auto_url() {
+		var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
+		for (var fil_i = 0; fil_i < filter_elements.length; fil_i++) {
+			filter_elements[fil_i].addEventListener('input', function() {update_window_url()});
+		}
+		update_window_url();
+}
+
+// automatically update page url
+chrome.storage.sync.get(null, function(stored_options) {
+	if (stored_options["auto-filter-page-url"]) {
+		setup_auto_url();
+	}
+});
+
