@@ -81,10 +81,39 @@ function setup_auto_url() {
 		update_window_url();
 }
 
+function generate_order_url() {
+	var order_url = "/cgi-bin/suppliers/index.cgi?item=order&page=vieworder"
+	var order_id = document.getElementsByName("itemForm")[0].id.value;
+	var order_string="&id="+order_id;
+	
+	var warehouse_string="";
+	//only include warehouse section if the element exists (it doesn't on quote pages)
+	if (document.getElementsByName("itemForm")[0].warehouse != null) {
+			var view_warehouse = document.getElementsByName("itemForm")[0].warehouse.value;
+			warehouse_string = "&warehouse="+view_warehouse;
+	}
+	
+	return order_url+order_string+warehouse_string;
+}
+
+function regenerate_order_url () {
+	window.history.replaceState("", "", generate_order_url());
+}
+
 // automatically update page url
 chrome.storage.sync.get(null, function(stored_options) {
 	if (stored_options["auto-filter-page-url"]) {
 		setup_auto_url();
+	}
+});
+
+// automatically repair order page URL
+chrome.storage.sync.get(null, function(stored_options) {
+	if (stored_options["auto-filter-page-url"]) {
+		// possibly replace with some sort of document.itemForm element value checks
+		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='vieworder']").length == 1) {
+			regenerate_order_url();
+		}
 	}
 });
 
