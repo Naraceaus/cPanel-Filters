@@ -1,13 +1,7 @@
-//set default options
-var on_page_options = {
-	"auto-filter-page-url":true,
-	auto_filter_page_url:true
-};
-
 // Saves options to chrome.storage
 function save_options() {
+		var on_page_options ={};
   on_page_options["auto-filter-page-url"] = document.getElementById('auto-filter-page-url').checked;
-  on_page_options.auto_filter_page_url = document.getElementById('auto-filter-page-url').checked;
   chrome.storage.sync.set(on_page_options, function() {
     // Update status to let user know options were saved.
     var save_btn = document.getElementById('save');
@@ -21,13 +15,12 @@ function save_options() {
   });
 }
 
-// Restores select box and checkbox state using the preferences
-// stored in chrome.storage.
+// Load options from extension onto page
 function load_options() {
-  // Use default value color = 'red' and likesColor = true.
-  chrome.storage.sync.get(on_page_options, function(stored_options) {
-    document.getElementById('auto-filter-page-url').checked = stored_options["auto-filter-page-url"];
-  });
+	chrome.storage.sync.get(null, function(stored_options) {
+			document.getElementById('auto-filter-page-url').checked = stored_options["auto-filter-page-url"];
+	});
 }
+
 document.addEventListener('DOMContentLoaded', load_options);
 document.getElementById('save').addEventListener('click', function() {save_options()});
