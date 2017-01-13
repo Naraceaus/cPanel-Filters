@@ -100,6 +100,21 @@ function regenerate_order_url () {
 	window.history.replaceState("", "", generate_order_url());
 }
 
+function generate_adv_conf_url() {
+	var adv_conf_url = "/cgi-bin/suppliers/index.cgi?item=config&page=view"
+	var adv_conf_id = document.getElementsByName("itemForm")[0].id.value;
+	var adv_conf_string="&id="+adv_conf_id;
+	
+	var mod_val = document.getElementsByName("itemForm")[0].mod.value;
+	var mod_string = "&mod="+mod_val;
+	
+	return adv_conf_url+adv_conf_string+mod_string;
+}
+
+function regenerate_adv_conf_url () {
+	window.history.replaceState("", "", generate_adv_conf_url());
+}
+
 // automatically update page url
 chrome.storage.sync.get(null, function(stored_options) {
 	if (stored_options["auto-filter-page-url"]) {
@@ -117,3 +132,12 @@ chrome.storage.sync.get(null, function(stored_options) {
 	}
 });
 
+// automatically repair advanced config URL
+chrome.storage.sync.get(null, function(stored_options) {
+	if (stored_options["auto-repair-adv-conf-url"]) {
+		// possibly replace with some sort of document.itemForm element value checks
+		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='view']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='config']").length == 1) {
+			regenerate_adv_conf_url();
+		}
+	}
+});

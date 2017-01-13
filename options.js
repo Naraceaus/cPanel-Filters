@@ -3,6 +3,7 @@ function save_options() {
 		var on_page_options ={};
   on_page_options["auto-filter-page-url"] = document.getElementById('auto-filter-page-url').checked;
   on_page_options["auto-repair-order-url"] = document.getElementById('auto-repair-order-url').checked;
+  on_page_options["auto-repair-adv-conf-url"] = document.getElementById('auto-repair-adv-conf-url').checked;
 		
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
@@ -20,6 +21,7 @@ function load_options() {
 	chrome.storage.sync.get(null, function(stored_options) {
 			document.getElementById('auto-filter-page-url').checked = stored_options["auto-filter-page-url"];
 			document.getElementById('auto-repair-order-url').checked = stored_options["auto-repair-order-url"];
+			document.getElementById('auto-repair-adv-conf-url').checked = stored_options["auto-repair-adv-conf-url"];
 	});
 }
 
