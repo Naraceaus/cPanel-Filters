@@ -109,9 +109,9 @@ chrome.storage.sync.get(null, function(stored_options) {
 
 // automatically repair order page URL
 chrome.storage.sync.get(null, function(stored_options) {
-	if (stored_options["auto-filter-page-url"]) {
+	if (stored_options["auto-repair-order-url"]) {
 		// possibly replace with some sort of document.itemForm element value checks
-		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='vieworder']").length == 1) {
+		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='vieworder']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='order']").length == 1) {
 			regenerate_order_url();
 		}
 	}
