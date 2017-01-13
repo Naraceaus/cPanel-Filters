@@ -155,4 +155,8 @@ chrome.storage.sync.get(null, function(stored_options) {
 	if (stored_options["auto-repair-refund-url"]) {
 		repair_url("/_cpanel/refund", {}, ["id"]);
 	}
+	// shipping rates
+	if (stored_options["auto-repair-ship-rates-url"]) {
+		repair_url("/_cpanel/refund", {}, ["id"]);
+	}
 });
