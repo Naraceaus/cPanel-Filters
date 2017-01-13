@@ -11,6 +11,7 @@ function initialise_options() {
 		default_options["auto-repair-coupon-url"]=true;
 		default_options["auto-repair-refund-url"]=true;
 		default_options["auto-repair-ship-rates-url"]=true;
+		default_options["auto-repair-ship-methods-url"]=true;
 		
 		var def_opt_keys = Object.keys(default_options);
 		
