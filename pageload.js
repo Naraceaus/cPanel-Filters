@@ -153,16 +153,4 @@ chrome.storage.sync.get(null, function(stored_options) {
 });
 
 
-/*
-function generate_coupon_url() {
-	var coupon_url = "/cgi-bin/suppliers/index.cgi/cgi-bin/suppliers/index.cgi/cgi-bin/suppliers/index.cgiitem=discounts&page=view"
-	var coupon_id = document.getElementsByName("itemForm")[0].id.value;
-	var coupon_string="&id="+coupon_id;
 	
-	return coupon_url+coupon_string;
-}
-
-function regenerate_coupon_url () {
-	window.history.replaceState("", "", generate_coupon_url());
-}
-*/
