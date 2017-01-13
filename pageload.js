@@ -18,7 +18,13 @@ function process_message(request, sender, sendResponse) {
 }
 
 function generate_filter_url() {
-	var domain = window.location.hostname+window.location.pathname;
+	var main_url = window.location.hostname+window.location.pathname;
+	var filter_string = generate_filter_string();
+	
+	return main_url+filter_string;
+}
+
+function generate_filter_string() {
 	var filter_string = "";
 	
 	var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
@@ -29,8 +35,9 @@ function generate_filter_url() {
 	//fix ; in the url
 	filter_string = filter_string.replace(/;/g,"%3b");
 	
-	return domain+filter_string;
+	return filter_string;
 }
+
 
 function check_element_add_filter(pot_elem, start_fil_string){
 	var new_fil_string = start_fil_string;
