@@ -73,7 +73,7 @@ function update_window_url() {
 		window.history.replaceState("", "", generate_filter_string());
 }
 
-function setup_auto_url() {
+function auto_filter_setup() {
 		var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
 		for (var fil_i = 0; fil_i < filter_elements.length; fil_i++) {
 			filter_elements[fil_i].addEventListener('input', function() {update_window_url()});
@@ -81,42 +81,76 @@ function setup_auto_url() {
 		update_window_url();
 }
 
-function generate_order_url() {
-	var order_url = "/cgi-bin/suppliers/index.cgi?item=order&page=vieworder"
-	var order_id = document.getElementsByName("itemForm")[0].id.value;
-	var order_string="&id="+order_id;
+function gen_repair_url(base_path, required_inputs, optional_inputs) {
+	requirements_met = true;
+	var repaired_url = base_path + "?";
 	
-	var warehouse_string="";
-	//only include warehouse section if the element exists (it doesn't on quote pages)
-	if (document.getElementsByName("itemForm")[0].warehouse != null) {
-			var view_warehouse = document.getElementsByName("itemForm")[0].warehouse.value;
-			warehouse_string = "&warehouse="+view_warehouse;
+	var req_keys = Object.keys(required_inputs);
+	
+	// add required inputs
+	for (var req_i = 0; req_i < req_keys.length; req_i++) {
+		req_element = document.getElementsByName("itemForm")[0][req_keys[req_i]];
+		if (req_element!=null) {
+			if (req_element.value == required_inputs[req_keys[req_i]]) {
+				repaired_url+=req_keys[req_i]+"="+req_element.value+"&"
+			}	else {
+			requirements_met = false;
+			break;
+			}
+		}else {
+			requirements_met = false;
+			break;
+		}
 	}
 	
-	return order_url+order_string+warehouse_string;
-}
-
-function regenerate_order_url () {
-	window.history.replaceState("", "", generate_order_url());
-}
-
-function generate_adv_conf_url() {
-	var adv_conf_url = "/cgi-bin/suppliers/index.cgi?item=config&page=view"
-	var adv_conf_id = document.getElementsByName("itemForm")[0].id.value;
-	var adv_conf_string="&id="+adv_conf_id;
+	//add options inputs
+	for (var opt_i = 0; opt_i < optional_inputs.length; opt_i++) {
+		opt_element = document.getElementsByName("itemForm")[0][optional_inputs[opt_i]];
+		if (opt_element!=null) {
+			repaired_url+=optional_inputs[opt_i]+"="+opt_element.value+"&"
+		}
+	}
 	
-	var mod_val = document.getElementsByName("itemForm")[0].mod.value;
-	var mod_string = "&mod="+mod_val;
+	if (requirements_met) {
+		return repaired_url.slice(0, -1);
+	} else {
+		return null;
+	}
+}
+
+function repair_url(base_path,required_input,optional_input) {
+	var	new_url= gen_repair_url(base_path,required_input,optional_input);
+		if (new_url!=null) {
+				window.history.replaceState("", "", new_url);
+	}
+}
+
+// URL automations
+chrome.storage.sync.get(null, function(stored_options) {
+	// automatically update filter page url
+	if (stored_options["auto-filter-page-url"]) {
+		auto_filter_setup();
+	}
+
+	// order
+	if (stored_options["auto-repair-order-url"]) {
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"order","page":"vieworder"}, ["id","warehouse"]);
+	}	
+	// advanced config
+	if (stored_options["auto-repair-adv-conf-url"]) {
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"config","page":"view"}, ["id","mod"]);
+	}
 	
-	return adv_conf_url+adv_conf_string+mod_string;
-}
+	// coupon
+	if (stored_options["auto-repair-coupon-url"]) {
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"discounts","page":"view"}, ["id"]);
+	}
+});
 
-function regenerate_adv_conf_url () {
-	window.history.replaceState("", "", generate_adv_conf_url());
-}
 
+/*
 function generate_coupon_url() {
-	var coupon_url = "/cgi-bin/suppliers/index.cgi?item=discounts&page=view"
+	var coupon_url = "/cgi-bin/suppliers/index.cgi/cgi-bin/suppliers/index.cgi/cgi-bin/suppliers/index.cgiitem=discounts&page=view"
 	var coupon_id = document.getElementsByName("itemForm")[0].id.value;
 	var coupon_string="&id="+coupon_id;
 	
@@ -126,32 +160,4 @@ function generate_coupon_url() {
 function regenerate_coupon_url () {
 	window.history.replaceState("", "", generate_coupon_url());
 }
-
-// URL automations
-chrome.storage.sync.get(null, function(stored_options) {
-	// automatically update filter page url
-	if (stored_options["auto-filter-page-url"]) {
-		setup_auto_url();
-	}
-	
-	// automatically repair order page URL
-	if (stored_options["auto-repair-order-url"]) {
-		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='vieworder']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='order']").length == 1) {
-			regenerate_order_url();
-		}
-	}
-	
-	// automatically repair advanced config URL
-	if (stored_options["auto-repair-adv-conf-url"]) {
-		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='view']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='config']").length == 1) {
-			regenerate_adv_conf_url();
-		}
-	}
-	
-	// automatically repair coupon URL
-	if (stored_options["auto-repair-coupon-url"]) {
-		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='view']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='discounts']").length == 1) {
-			regenerate_coupon_url();
-		}
-	}
-});
+*/
