@@ -115,6 +115,18 @@ function regenerate_adv_conf_url () {
 	window.history.replaceState("", "", generate_adv_conf_url());
 }
 
+function generate_coupon_url() {
+	var coupon_url = "/cgi-bin/suppliers/index.cgi?item=discounts&page=view"
+	var coupon_id = document.getElementsByName("itemForm")[0].id.value;
+	var coupon_string="&id="+coupon_id;
+	
+	return coupon_url+coupon_string;
+}
+
+function regenerate_coupon_url () {
+	window.history.replaceState("", "", generate_coupon_url());
+}
+
 // URL automations
 chrome.storage.sync.get(null, function(stored_options) {
 	// automatically update filter page url
@@ -124,7 +136,6 @@ chrome.storage.sync.get(null, function(stored_options) {
 	
 	// automatically repair order page URL
 	if (stored_options["auto-repair-order-url"]) {
-		// possibly replace with some sort of document.itemForm element value checks
 		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='vieworder']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='order']").length == 1) {
 			regenerate_order_url();
 		}
@@ -132,9 +143,15 @@ chrome.storage.sync.get(null, function(stored_options) {
 	
 	// automatically repair advanced config URL
 	if (stored_options["auto-repair-adv-conf-url"]) {
-		// possibly replace with some sort of document.itemForm element value checks
 		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='view']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='config']").length == 1) {
 			regenerate_adv_conf_url();
+		}
+	}
+	
+	// automatically repair coupon URL
+	if (stored_options["auto-repair-coupon-url"]) {
+		if (document.querySelectorAll("form[name='itemForm'] input[name='page'][value='view']").length == 1 && document.querySelectorAll("form[name='itemForm'] input[name='item'][value='discounts']").length == 1) {
+			regenerate_coupon_url();
 		}
 	}
 });

@@ -8,6 +8,7 @@ function initialise_options() {
 		default_options["auto-filter-page-url"]=true;
 		default_options["auto-repair-order-url"]=true;
 		default_options["auto-repair-adv-conf-url"]=true;
+		default_options["auto-repair-coupon-url"]=true;
 		
 		var def_opt_keys = Object.keys(default_options);
 		
