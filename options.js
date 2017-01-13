@@ -10,6 +10,7 @@ function save_options() {
   on_page_options["auto-repair-ship-methods-url"] = document.getElementById('auto-repair-ship-methods-url').checked;
   on_page_options["auto-repair-pay-terms-url"] = document.getElementById('auto-repair-pay-terms-url').checked;
   on_page_options["auto-repair-pay-plan-url"] = document.getElementById('auto-repair-pay-plan-url').checked;
+  on_page_options["auto-repair-pre-pack-url"] = document.getElementById('auto-repair-pre-pack-url').checked;
 		
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
@@ -34,6 +35,7 @@ function load_options() {
 			document.getElementById('auto-repair-ship-methods-url').checked = stored_options["auto-repair-ship-methods-url"];
 			document.getElementById('auto-repair-pay-terms-url').checked = stored_options["auto-repair-pay-terms-url"];
 			document.getElementById('auto-repair-pay-plan-url').checked = stored_options["auto-repair-pay-plan-url"];
+			document.getElementById('auto-repair-pre-pack-url').checked = stored_options["auto-repair-pre-pack-url"];
 	});
 }
 

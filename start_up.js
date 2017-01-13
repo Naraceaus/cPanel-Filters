@@ -14,6 +14,7 @@ function initialise_options() {
 		default_options["auto-repair-ship-methods-url"]=true;
 		default_options["auto-repair-pay-terms-url"]=true;
 		default_options["auto-repair-pay-plan-url"]=true;
+		default_options["auto-repair-pre-pack-url"]=true;
 		
 		var def_opt_keys = Object.keys(default_options);
 		
