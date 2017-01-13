@@ -168,8 +168,14 @@ chrome.storage.sync.get(null, function(stored_options) {
 		repair_url("/_cpanel/shippinggroup/view", {}, ["id"]);
 	}
 	
-	// shipping methods
+	// payment terms
 	if (stored_options["auto-repair-pay-terms-url"]) {
 		repair_url("_cpanel/custerms", {}, ["id"]);
+	}
+	
+	// payment plan
+	if (stored_options["auto-repair-pay-terms-url"]) {
+		repair_url("_cpanel/orderplan", {}, ["id"]);
+		repair_url("_cpanel/orderplan/view", {}, ["id"]);
 	}
 });
