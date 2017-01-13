@@ -15,6 +15,16 @@ function initialise_options() {
 		default_options["auto-repair-pay-terms-url"]=true;
 		default_options["auto-repair-pay-plan-url"]=true;
 		default_options["auto-repair-pre-pack-url"]=true;
+		default_options["auto-repair-ship-group-url"]=true;
+		default_options["auto-repair-ship-zone-url"]=true;
+		default_options["auto-repair-prod-group-url"]=true;
+		default_options["auto-repair-dispute-url"]=true;
+		default_options["auto-repair-seo-url"]=true;
+		default_options["auto-repair-canned-url"]=true;
+		default_options["auto-repair-cus-doc-url"]=true;
+		default_options["auto-repair-doc-temp-set-url"]=true;
+		default_options["auto-repair-imp-exp-url"]=true;
+		default_options["auto-repair-cus-conf-url"]=true;
 		
 		var def_opt_keys = Object.keys(default_options);
 		

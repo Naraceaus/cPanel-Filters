@@ -11,6 +11,16 @@ function save_options() {
   on_page_options["auto-repair-pay-terms-url"] = document.getElementById('auto-repair-pay-terms-url').checked;
   on_page_options["auto-repair-pay-plan-url"] = document.getElementById('auto-repair-pay-plan-url').checked;
   on_page_options["auto-repair-pre-pack-url"] = document.getElementById('auto-repair-pre-pack-url').checked;
+  on_page_options["auto-repair-ship-group-url"] = document.getElementById('auto-repair-ship-group-url').checked;
+  on_page_options["auto-repair-ship-zone-url"] = document.getElementById('auto-repair-ship-zone-url').checked;
+  on_page_options["auto-repair-prod-group-url"] = document.getElementById('auto-repair-prod-group-url').checked;
+  on_page_options["auto-repair-dispute-url"] = document.getElementById('auto-repair-dispute-url').checked;
+  on_page_options["auto-repair-seo-url"] = document.getElementById('auto-repair-seo-url').checked;
+  on_page_options["auto-repair-canned-url"] = document.getElementById('auto-repair-canned-url').checked;
+  on_page_options["auto-repair-cus-doc-url"] = document.getElementById('auto-repair-cus-doc-url').checked;
+  on_page_options["auto-repair-doc-temp-set-url"] = document.getElementById('auto-repair-doc-temp-set-url').checked;
+  on_page_options["auto-repair-imp-exp-url"] = document.getElementById('auto-repair-imp-exp-url').checked;
+  on_page_options["auto-repair-cus-conf-url"] = document.getElementById('auto-repair-cus-conf-url').checked;
 		
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
@@ -36,6 +46,16 @@ function load_options() {
 			document.getElementById('auto-repair-pay-terms-url').checked = stored_options["auto-repair-pay-terms-url"];
 			document.getElementById('auto-repair-pay-plan-url').checked = stored_options["auto-repair-pay-plan-url"];
 			document.getElementById('auto-repair-pre-pack-url').checked = stored_options["auto-repair-pre-pack-url"];
+			document.getElementById('auto-repair-ship-group-url').checked = stored_options["auto-repair-ship-group-url"];
+			document.getElementById('auto-repair-ship-zone-url').checked = stored_options["auto-repair-ship-zone-url"];
+			document.getElementById('auto-repair-prod-group-url').checked = stored_options["auto-repair-prod-group-url"];
+			document.getElementById('auto-repair-dispute-url').checked = stored_options["auto-repair-dispute-url"];
+			document.getElementById('auto-repair-seo-url').checked = stored_options["auto-repair-seo-url"];
+			document.getElementById('auto-repair-canned-url').checked = stored_options["auto-repair-canned-url"];
+			document.getElementById('auto-repair-cus-doc-url').checked = stored_options["auto-repair-cus-doc-url"];
+			document.getElementById('auto-repair-doc-temp-set-url').checked = stored_options["auto-repair-doc-temp-set-url"];
+			document.getElementById('auto-repair-imp-exp-url').checked = stored_options["auto-repair-imp-exp-url"];
+			document.getElementById('auto-repair-cus-conf-url').checked = stored_options["auto-repair-cus-conf-url"];
 	});
 }
 

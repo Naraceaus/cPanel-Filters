@@ -174,8 +174,73 @@ chrome.storage.sync.get(null, function(stored_options) {
 	}
 	
 	// payment plan
-	if (stored_options["auto-repair-pay-terms-url"]) {
-		repair_url("_cpanel/orderplan", {}, ["id"]);
-		repair_url("_cpanel/orderplan/view", {}, ["id"]);
+	if (stored_options["auto-repair-pay-plan-url"]) {
+		repair_url("/_cpanel/orderplan", {}, ["id"]);
+		repair_url("/_cpanel/orderplan/view", {}, ["id"]);
 	}
+	
+	// predefined package
+	if (stored_options["auto-repair-pre-pack-url"]) {
+		repair_url("/_cpanel/package", {}, ["id"]);
+		repair_url("/_cpanel/package/view", {}, ["id"]);
+	}
+	
+	// shipping groups
+	if (stored_options["auto-repair-ship-group-url"]) {
+		repair_url("/_cpanel/shippingid", {}, ["id"]);
+		repair_url("/_cpanel/shippingid/view", {}, ["id"]);
+	}
+	
+	// shipping zones
+	if (stored_options["auto-repair-ship-zone-url"]) {
+		repair_url("/_cpanel/zone", {}, ["id"]);
+		repair_url("/_cpanel/zone/view", {}, ["id"]);1
+	}
+	
+	// product groups
+	if (stored_options["auto-repair-prod-group-url"]) {
+		repair_url("/_cpanel/itemgroups", {}, ["id"]);
+		repair_url("/_cpanel/itemgroups/view", {}, ["id"]);
+	}
+	
+	// dispute reasons
+	if (stored_options["auto-repair-dispute-url"]) {
+		repair_url("/_cpanel/dispute_reasons", {}, ["id"]);
+		repair_url("/_cpanel/dispute_reasons/view", {}, ["id"]);
+	}
+	
+	// SEO Entry
+	if (stored_options["auto-repair-seo-url"]) {
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"seo","page":"view"}, ["id"]);
+	}
+	
+	// canned response
+	if (stored_options["auto-repair-canned-url"]) {
+		repair_url("/_cpanel/cannedresponses", {}, ["id"]);
+		repair_url("/_cpanel/cannedresponses/view", {}, ["id"]);
+	}
+	
+	// custom doc
+	if (stored_options["auto-repair-cus-doc-url"]) {
+		repair_url("/_cpanel/custom_docs", {}, ["id"]);
+		repair_url("/_cpanel/custom_docs/view", {}, ["id"]);
+	}
+		
+	// Custom document template sets
+	if (stored_options["auto-repair-seo-url"]) {
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"doctmpl","page":"view"}, ["id"]);
+	}
+	
+	// import/export templates
+	if (stored_options["auto-repair-imp-exp-url"]) {
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"dsimport","page":"view"}, ["id"]);
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"dsexport","page":"view"}, ["id"]);
+	}
+	
+	// custom configs
+	if (stored_options["auto-repair-cus-conf-url"]) {
+		repair_url("/_cpanel/custom_configs", {}, ["id"]);
+		repair_url("/_cpanel/custom_configs/view", {}, ["id"]);
+	}
+			
 });
