@@ -5,6 +5,7 @@ function save_options() {
   on_page_options["auto-repair-order-url"] = document.getElementById('auto-repair-order-url').checked;
   on_page_options["auto-repair-adv-conf-url"] = document.getElementById('auto-repair-adv-conf-url').checked;
   on_page_options["auto-repair-coupon-url"] = document.getElementById('auto-repair-coupon-url').checked;
+  on_page_options["auto-repair-refund-url"] = document.getElementById('auto-repair-refund-url').checked;
 		
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
@@ -24,6 +25,7 @@ function load_options() {
 			document.getElementById('auto-repair-order-url').checked = stored_options["auto-repair-order-url"];
 			document.getElementById('auto-repair-adv-conf-url').checked = stored_options["auto-repair-adv-conf-url"];
 			document.getElementById('auto-repair-coupon-url').checked = stored_options["auto-repair-coupon-url"];
+			document.getElementById('auto-repair-refund-url').checked = stored_options["auto-repair-refund-url"];
 	});
 }
 

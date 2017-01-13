@@ -152,7 +152,7 @@ chrome.storage.sync.get(null, function(stored_options) {
 	}
 	
 	// refund
-	if (stored_options["auto-repair-coupon-url"]) {
+	if (stored_options["auto-repair-refund-url"]) {
 		repair_url("/_cpanel/refund", {}, ["id"]);
 	}
 });
