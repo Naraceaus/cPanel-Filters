@@ -3,7 +3,7 @@
 
   "name": "cPanel Filters",
   "description": "Generate cPanel URLS that match the filter on the page",
-  "version": "1.0",
+  "version": "1.1",
 		"options_ui":{
 			"page":"options.html",
 			"chrome_style": true
