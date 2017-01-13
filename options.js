@@ -2,16 +2,14 @@
 function save_options() {
 		var on_page_options ={};
   on_page_options["auto-filter-page-url"] = document.getElementById('auto-filter-page-url').checked;
+		// Update status to let user know options were saved.
+		var save_btn = document.getElementById('save');
+		save_btn.textContent = 'Saving...';
   chrome.storage.sync.set(on_page_options, function() {
-    // Update status to let user know options were saved.
-    var save_btn = document.getElementById('save');
-    save_btn.textContent = 'Saving...';
-    setTimeout(function() {
-      document.getElementById('save').textContent = 'Options Saved';
-						setTimeout(function() {
-							document.getElementById('save').textContent = 'Save';
-						}, 750);
-    }, 750);
+			document.getElementById('save').textContent = 'Options Saved';
+			setTimeout(function() {
+				document.getElementById('save').textContent = 'Save';
+			}, 750);
   });
 }
 
