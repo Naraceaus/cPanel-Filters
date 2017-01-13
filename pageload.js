@@ -157,6 +157,7 @@ chrome.storage.sync.get(null, function(stored_options) {
 	}
 	// shipping rates
 	if (stored_options["auto-repair-ship-rates-url"]) {
-		repair_url("/_cpanel/refund", {}, ["id"]);
+		repair_url("/_cpanel/shippingcostmgr", {}, ["id"]);
+		repair_url("/_cpanel/shippingcostmgr/view", {}, ["id"]);
 	}
 });
