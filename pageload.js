@@ -8,7 +8,9 @@ function process_message(request, sender, sendResponse) {
 	switch (request.title) {
 		case "get-filter-url":
    sendResponse({target:"popup",title:"filter-url",filter_url:generate_filter_url()});
-
+			break;
+		case "find-page-in-cpanel":
+   sendResponse({target:"popup",title:"found-cpanel-url",cpanel_url:find_url_in_cpanel()});
 			break;
 		case "clear-out":
 			clear_modifications();
@@ -79,6 +81,17 @@ function auto_filter_setup() {
 			filter_elements[fil_i].addEventListener('input', function() {update_window_url()});
 		}
 		update_window_url();
+}
+
+function find_url_in_cpanel() {
+	//cpanel always uses https
+	var host = "https://"+window.location.host;
+	//remove the preceding "/"
+	var path = window.location.pathname.slice(1);
+	var cpanel_filter = "/_cpanel/url?_ftr_request_url=^";
+	
+	return host+cpanel_filter+path;
+	
 }
 
 function gen_repair_url(base_path, required_inputs, optional_inputs) {

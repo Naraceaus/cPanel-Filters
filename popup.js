@@ -11,6 +11,11 @@ document.addEventListener( "DOMContentLoaded", function() {
 	document.getElementById("refresh-filter").addEventListener("click", function () {
 		get_filter_url();
 	});
+	
+	document.getElementById("find-page").addEventListener("click", function () {
+		find_page_in_cpanel();
+	});
+	
 	get_filter_url();
 });
 
@@ -32,8 +37,29 @@ function get_filter_url() {
 
 function print_filter_url(response) {
 	if (response!=null) {
-		document.getElementsByName("filter-url")[0].value=response.filter_url;
+		update_results(response.filter_url);
+	} else {
+		update_results("Error: Please refresh the active tab");
+	}
+}
+
+function find_page_in_cpanel() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want to find page in cPanel");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "find-page-in-cpanel"}, function(response) {print_found_cpanel_url(response);});  
+	});
+}
+
+function print_found_cpanel_url(response) {
+	if (response!=null) {
+		chrome.tabs.create({url:response.cpanel_url,selected:true}, function (tab) {
+					update_results(response.cpanel_url);
+		});
 	} else {
 		document.getElementsByName("filter-url")[0].value="Error: Please refresh the active tab";
 	}
+}
+
+function update_results(result) {
+	document.getElementsByName("filter-url")[0].value=result;
 }
