@@ -12,9 +12,14 @@ function process_message(request, sender, sendResponse) {
 		case "find-page-in-cpanel":
    sendResponse({target:"popup",title:"found-cpanel-url",cpanel_url:find_url_in_cpanel()});
 			break;
-		case "clear-out":
-			clear_modifications();
+		case "highlight-adverts":
+			remove_ad_highlight();
+			place_ad_highlight();
 			break;
+		case "de-highlight-adverts":
+			remove_ad_highlight();
+			break;
+		
 		default:
 	}
 }
@@ -92,6 +97,45 @@ function find_url_in_cpanel() {
 	
 	return host+cpanel_filter+path;
 	
+}
+
+function remove_ad_highlight() {
+	var imgs_highlighted = document.querySelectorAll(".ad-high-cont img[src*='/assets/marketing");
+
+	for (var ex_i = 0; ex_i < imgs_highlighted.length; ex_i++) {
+		var high_img = imgs_highlighted[ex_i];
+		var assumed_high_cont = high_img.parentElement;
+		var assumed_cont_par = assumed_high_cont.parentElement;
+		
+		assumed_cont_par.appendChild(high_img);
+		assumed_cont_par.removeChild(assumed_high_cont);
+	}
+}
+
+function place_ad_highlight() {
+	var ad_imgs = document.querySelectorAll("img[src*='/assets/marketing']");
+	for (var ad_i=0; ad_i < ad_imgs.length; ad_i++) {
+		var advert = ad_imgs[ad_i];
+		var advert_parent = advert.parentElement;
+		var new_cont = document.createElement("div");
+		new_cont.className="ad-high-cont";
+		new_cont.style.position="relative";
+		
+		var high_link = document.createElement("a");
+		high_link.className="ad-highlight";
+		high_link.href=advert.src.replace("/assets/marketing/","/_cpanel/adw/view?id=").replace(".jpg","").replace(".png","");
+		var high_btn = document.createElement("button");
+		high_btn.type = "button";
+		high_btn.textContent = "Open in cPanel";
+		high_btn.style.position="absolute";
+		high_btn.style.top="0px";
+		high_btn.style.right="0px";
+		high_link.appendChild(high_btn);
+		
+		new_cont.appendChild(advert);
+		new_cont.appendChild(high_link);
+		advert_parent.appendChild(new_cont);
+	}
 }
 
 function gen_repair_url(base_path, required_inputs, optional_inputs) {
