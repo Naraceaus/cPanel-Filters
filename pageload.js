@@ -14,10 +14,10 @@ function process_message(request, sender, sendResponse) {
 			break;
 		case "highlight-adverts":
 			remove_ad_highlight();
-			place_ad_highlight();
+			sendResponse({target:"popup",title:"placed-ad-highlights",num_ads_found:place_ad_highlight()});
 			break;
 		case "de-highlight-adverts":
-			remove_ad_highlight();
+			sendResponse({target:"popup",title:"removed-ad-highlights",num_ads_removed:remove_ad_highlight()});
 			break;
 		
 		default:
@@ -100,8 +100,8 @@ function find_url_in_cpanel() {
 }
 
 function remove_ad_highlight() {
+	var num_ads_found = 0;
 	var imgs_highlighted = document.querySelectorAll(".ad-high-cont img[src*='/assets/marketing");
-
 	for (var ex_i = 0; ex_i < imgs_highlighted.length; ex_i++) {
 		var high_img = imgs_highlighted[ex_i];
 		var assumed_high_cont = high_img.parentElement;
@@ -109,10 +109,14 @@ function remove_ad_highlight() {
 		
 		assumed_cont_par.appendChild(high_img);
 		assumed_cont_par.removeChild(assumed_high_cont);
+		num_ads_found++;
 	}
+	
+	return num_ads_found;
 }
 
 function place_ad_highlight() {
+	var num_ads_found = 0;
 	var ad_imgs = document.querySelectorAll("img[src*='/assets/marketing']");
 	for (var ad_i=0; ad_i < ad_imgs.length; ad_i++) {
 		var advert = ad_imgs[ad_i];
@@ -135,7 +139,9 @@ function place_ad_highlight() {
 		new_cont.appendChild(advert);
 		new_cont.appendChild(high_link);
 		advert_parent.appendChild(new_cont);
+		num_ads_found++;
 	}
+	return num_ads_found;
 }
 
 function gen_repair_url(base_path, required_inputs, optional_inputs) {

@@ -72,15 +72,31 @@ function print_found_cpanel_url(response) {
 function highlight_ads() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to highlight adverts");
-		chrome.tabs.sendMessage(tabs[0].id, {title: "highlight-adverts"}, function(response) {});  
+		chrome.tabs.sendMessage(tabs[0].id, {title: "highlight-adverts"}, function(response) {print_placed_highlights(response)});  
 	});
 }
 
 function de_highlight_ads() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to de highlight adverts");
-		chrome.tabs.sendMessage(tabs[0].id, {title: "de-highlight-adverts"}, function(response) {});  
+		chrome.tabs.sendMessage(tabs[0].id, {title: "de-highlight-adverts"}, function(response) {print_removed_highlights(response)});  
 	});
+}
+
+function print_placed_highlights(response) {
+	if (response!=null) {
+		update_results("Placed "+response.num_ads_found+" advert highlights");
+	} else {
+		document.getElementsByName("filter-url")[0].value="Error: Please refresh the active tab";
+	}
+}
+
+function print_removed_highlights(response) {
+	if (response!=null) {
+		update_results("Removed "+response.num_ads_removed+" advert highlights");
+	} else {
+		document.getElementsByName("filter-url")[0].value="Error: Please refresh the active tab";
+	}
 }
 
 function update_results(result) {
