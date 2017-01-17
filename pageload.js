@@ -205,7 +205,6 @@ function prepend_method_ids_to_calc_ship(enabled) {
 					var opt = meth_options[opt_i];
 					
 					opt.textContent = opt.value + " - " + opt.textContent;
-					console.log("added met_id: "+opt.value);
 				}
 			}
 		}
