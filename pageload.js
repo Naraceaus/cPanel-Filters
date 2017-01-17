@@ -193,7 +193,26 @@ function repair_url(base_path,required_input,optional_input) {
 	}
 }
 
-// URL automations
+//Placing id numebrs in front of shipping method dropdowns on calc shipping for orders
+function prepend_method_ids_to_calc_ship(enabled) {
+	var itemForms = document.getElementsByName("itemForm");
+	if (itemForms.length == 1 && enabled) {
+		if (itemForms[0].item != null && itemForms[0].page!=null) {
+			if (itemForms[0].item.value=="order" && itemForms[0].page.value=="vieworder") {
+				var meth_options = document.querySelectorAll("[name='_odr_sh_gp'] option");
+
+				for (var opt_i = 0; opt_i < meth_options.length; opt_i++) {
+					var opt = meth_options[opt_i];
+					
+					opt.textContent = opt.value + " - " + opt.textContent;
+					console.log("added met_id: "+opt.value);
+				}
+			}
+		}
+	}
+}
+
+// Page Load Automations
 chrome.storage.sync.get(null, function(stored_options) {
 	// automatically update filter page url
 	if (stored_options["auto-filter-page-url"]) {
@@ -305,5 +324,7 @@ chrome.storage.sync.get(null, function(stored_options) {
 		repair_url("/_cpanel/custom_configs", {}, ["id"]);
 		repair_url("/_cpanel/custom_configs/view", {}, ["id"]);
 	}
+	
+	prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
 			
 });

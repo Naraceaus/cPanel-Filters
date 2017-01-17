@@ -21,6 +21,7 @@ function save_options() {
   on_page_options["auto-repair-doc-temp-set-url"] = document.getElementById('auto-repair-doc-temp-set-url').checked;
   on_page_options["auto-repair-imp-exp-url"] = document.getElementById('auto-repair-imp-exp-url').checked;
   on_page_options["auto-repair-cus-conf-url"] = document.getElementById('auto-repair-cus-conf-url').checked;
+  on_page_options["prepend-view-order-method-ids"] = document.getElementById('prepend-view-order-method-ids').checked;
 		
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
