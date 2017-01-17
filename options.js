@@ -57,6 +57,7 @@ function load_options() {
 			document.getElementById('auto-repair-doc-temp-set-url').checked = stored_options["auto-repair-doc-temp-set-url"];
 			document.getElementById('auto-repair-imp-exp-url').checked = stored_options["auto-repair-imp-exp-url"];
 			document.getElementById('auto-repair-cus-conf-url').checked = stored_options["auto-repair-cus-conf-url"];
+			document.getElementById('prepend-view-order-method-ids').checked = stored_options["prepend-view-order-method-ids"];
 	});
 }
 
