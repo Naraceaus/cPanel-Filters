@@ -220,9 +220,14 @@ function purge_server_cache() {
 	purge_req.onreadystatechange = function() {
 					if (purge_req.readyState == XMLHttpRequest.DONE ) {
 								if (purge_req.status == 200) {
-												console.log(purge_req.responseText);
+									if (purge_req.responseText == "NSD1;#1|$2|ok$1|1") {
+												console.log("Cache Purged");
 												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Cache Purged"}, function() {});
 												location.reload();
+									} else {
+												console.log("Cache loaded non-cache message");
+												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Purging Cache Failed. Please make sure this is a Neto site and you are logged into the control panel"}, function() {});
+									}
 								}
 								else if (purge_req.status == 400) {
 											console.log('There was an error 400');
@@ -235,11 +240,11 @@ function purge_server_cache() {
 					}
 	};
 
-	purge_req.open("POST","/_cpanel", true);
+	purge_req.open("POST","https://"+window.location.host+"/_cpanel", true);
 	purge_req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
 	purge_req.send("ajaxfn=system_refresh&ajax=y");
 	
-	return "Purging Cache";
+	return "Purging Cache, page will refresh once cache is purged";
 }
 
 // Page Load Automations
