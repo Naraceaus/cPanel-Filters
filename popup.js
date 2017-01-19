@@ -24,6 +24,10 @@ document.addEventListener( "DOMContentLoaded", function() {
 		de_highlight_ads();
 	});
 	
+	document.getElementById("purge-cache").addEventListener("click", function () {
+		purge_server_cache();
+	});
+	
 	
 	get_filter_url();
 });
@@ -33,6 +37,9 @@ function process_message(request, sender, sendResponse) {
  console.log(request.title);
 
  switch (request.title) {
+		case "cache-purge":
+   update_results(request.status);
+			break;
   default:
  }
 }
@@ -97,6 +104,13 @@ function print_removed_highlights(response) {
 	} else {
 		document.getElementsByName("filter-url")[0].value="Error: Please refresh the active tab";
 	}
+}
+
+function purge_server_cache() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want to purge the server cache");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "purge-server-cache"}, function(response) {update_results(response.status)});  
+	});
 }
 
 function update_results(result) {

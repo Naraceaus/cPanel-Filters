@@ -19,6 +19,9 @@ function process_message(request, sender, sendResponse) {
 		case "de-highlight-adverts":
 			sendResponse({target:"popup",title:"removed-ad-highlights",num_ads_removed:remove_ad_highlight()});
 			break;
+		case "purge-server-cache":
+			sendResponse({target:"popup",title:"purge-server-cache",status:purge_server_cache()});
+			break;
 		
 		default:
 	}
@@ -209,6 +212,34 @@ function prepend_method_ids_to_calc_ship(enabled) {
 			}
 		}
 	}
+}
+
+//purge cache and refresh page
+function purge_server_cache() {
+	var purge_req = new XMLHttpRequest();
+	purge_req.onreadystatechange = function() {
+					if (purge_req.readyState == XMLHttpRequest.DONE ) {
+								if (purge_req.status == 200) {
+												console.log(purge_req.responseText);
+												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Cache Purged"}, function() {});
+												location.reload();
+								}
+								else if (purge_req.status == 400) {
+											console.log('There was an error 400');
+											chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"400 Error, Bad Data"}, function() {});
+								}
+								else {
+												console.log('something else other than 200 was returned');
+												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:purge_req.status+" Error"}, function() {});
+								}
+					}
+	};
+
+	purge_req.open("POST","/_cpanel", true);
+	purge_req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+	purge_req.send("ajaxfn=system_refresh&ajax=y");
+	
+	return "Purging Cache";
 }
 
 // Page Load Automations
