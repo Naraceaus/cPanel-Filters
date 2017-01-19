@@ -221,21 +221,17 @@ function purge_server_cache() {
 					if (purge_req.readyState == XMLHttpRequest.DONE ) {
 								if (purge_req.status == 200) {
 									if (purge_req.responseText == "NSD1;#1|$2|ok$1|1") {
-												console.log("Cache Purged");
 												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Cache Purged"}, function() {});
 												location.reload();
 									} else {
-												console.log("Cache loaded non-cache message");
 												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Purging Cache Failed. Please make sure this is a Neto site and you are logged into the control panel"}, function() {});
 									}
 								}
 								else if (purge_req.status == 400) {
-											console.log('There was an error 400');
 											chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"400 Error, Bad Data"}, function() {});
 								}
 								else {
-												console.log('something else other than 200 was returned');
-												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:purge_req.status+" Error"}, function() {});
+												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:purge_req.status+" Unknown Error"}, function() {});
 								}
 					}
 	};
