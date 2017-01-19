@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "cPanel Filters",
-  "description": "Generate cPanel URLS that match the filter on the page",
+  "name": "cPanel Helper",
+  "description": "A series of small functions that make using the Neto cPanel simpler",
   "version": "1.9",
 		"options_ui":{
 			"page":"options.html",
