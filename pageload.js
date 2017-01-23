@@ -22,6 +22,9 @@ function process_message(request, sender, sendResponse) {
 		case "purge-server-cache":
 			sendResponse({target:"popup",title:"purge-server-cache",status:purge_server_cache()});
 			break;
+		case "heavily-purge-server-cache":
+			sendResponse({target:"popup",title:"heavily-purge-server-cache",status:heavily_purge_server_cache()});
+			break;
 		
 		default:
 	}
@@ -131,6 +134,9 @@ function place_ad_highlight() {
 		var high_link = document.createElement("a");
 		high_link.className="ad-highlight";
 		high_link.href=advert.src.replace("/assets/marketing/","/_cpanel/adw/view?id=").replace(".jpg","").replace(".png","");
+		high_link.style.position = "absolute";
+		high_link.style.left = "50%";
+		high_link.style.marginRight = "-50%";
 		var high_btn = document.createElement("button");
 		high_btn.type = "button";
 		high_btn.textContent = "Open in cPanel";
@@ -230,7 +236,7 @@ function purge_server_cache() {
 								else if (purge_req.status == 400) {
 											chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"400 Error, Bad Data"}, function() {});
 								}
-								else {
+								else {m
 												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:purge_req.status+" Unknown Error"}, function() {});
 								}
 					}
@@ -241,6 +247,30 @@ function purge_server_cache() {
 	purge_req.send("ajaxfn=system_refresh&ajax=y");
 	
 	return "Purging Cache, page will refresh once cache is purged";
+}
+
+//heavily purge cache including querystring appended to js and css files allowing those fields to be purged on all machines
+function heavily_purge_server_cache() {
+	var heavy_purge_req = new XMLHttpRequest();
+	heavy_purge_req.onreadystatechange = function() {
+					if (heavy_purge_req.readyState == XMLHttpRequest.DONE ) {
+								if (heavy_purge_req.status == 200) {
+									purge_server_cache();
+								}
+								else if (heavy_purge_req.status == 400) {
+											chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"400 Error, Bad Data"}, function() {});
+								}
+								else {m
+												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:heavy_purge_req.status+" Unknown Error"}, function() {});
+								}
+					}
+	};
+
+	heavy_purge_req.open("POST","https://"+window.location.host+"/_cpanel", true);
+	heavy_purge_req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+	heavy_purge_req.send("tkn=webshop&proc=edit&ajax=y");
+	
+	return "Heavily Purging Cache, page will refresh once cache is purged";
 }
 
 // Page Load Automations

@@ -28,6 +28,10 @@ document.addEventListener( "DOMContentLoaded", function() {
 		purge_server_cache();
 	});
 	
+	document.getElementById("heavily-purge-cache").addEventListener("click", function () {
+		heavily_purge_server_cache();
+	});
+	
 	
 	get_filter_url();
 });
@@ -110,6 +114,13 @@ function purge_server_cache() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to purge the server cache");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "purge-server-cache"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function heavily_purge_server_cache() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want to HEAVILY purge the server cache");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "heavily-purge-server-cache"}, function(response) {update_results(response.status)});  
 	});
 }
 
