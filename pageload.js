@@ -25,6 +25,9 @@ function process_message(request, sender, sendResponse) {
 		case "heavily-purge-server-cache":
 			sendResponse({target:"popup",title:"heavily-purge-server-cache",status:heavily_purge_server_cache()});
 			break;
+		case "display-parent-fields":
+			sendResponse({target:"popup",title:"display-parent-fields",status:display_parent_fields()});
+			break;
 		
 		default:
 	}
@@ -273,6 +276,21 @@ function heavily_purge_server_cache() {
 	heavy_purge_req.send("tkn=webshop&proc=edit&ajax=y");
 	
 	return "Heavily Purging Cache, page will refresh once cache is purged";
+}
+
+//on parent products display fields normally hidden from the user
+function display_parent_fields() {
+	var hidden_fields = document.getElementsByClassName("cp-hide-inparent");
+	var num_hidden_fields = hidden_fields.length;
+	
+	for (var hfi = 0; hfi < hidden_fields.length;) {
+		hidden_fields[0].className = hidden_fields[0].className.replace("cp-hide-inparent","");
+	}
+	
+	if (num_hidden_fields > 0) {
+		return "Displayed "+num_hidden_fields+" parent fields";
+	}
+	return "No parent fields to display, make sure your active";
 }
 
 // Page Load Automations

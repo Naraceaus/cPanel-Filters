@@ -32,6 +32,9 @@ document.addEventListener( "DOMContentLoaded", function() {
 		heavily_purge_server_cache();
 	});
 	
+	document.getElementById("display-parent-fields").addEventListener("click", function () {
+		display_parent_fields();
+	});
 	
 	get_filter_url();
 });
@@ -121,6 +124,13 @@ function heavily_purge_server_cache() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to HEAVILY purge the server cache");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "heavily-purge-server-cache"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function display_parent_fields() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want parent fields made visible");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "display-parent-fields"}, function(response) {update_results(response.status)});  
 	});
 }
 
