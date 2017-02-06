@@ -87,11 +87,13 @@ function update_window_url() {
 }
 
 function auto_filter_setup() {
-		var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
-		for (var fil_i = 0; fil_i < filter_elements.length; fil_i++) {
-			filter_elements[fil_i].addEventListener('input', function() {update_window_url()});
-		}
+	var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
+	for (var fil_i = 0; fil_i < filter_elements.length; fil_i++) {
+		filter_elements[fil_i].addEventListener('input', function() {update_window_url()});
+	}
+	if (filter_elements.length > 0) {
 		update_window_url();
+	}
 }
 
 function find_url_in_cpanel() {
