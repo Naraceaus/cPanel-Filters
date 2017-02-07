@@ -225,6 +225,33 @@ function prepend_method_ids_to_calc_ship(enabled) {
 	}
 }
 
+
+
+// one customer cards add the id in brackets to the end of custom fields
+function append_id_to_cust_customer_fields(enabled) {
+	if (window.location.pathname == "/_cpanel/customer/view" && enabled) {
+		var cu_els = document.querySelectorAll("[name*='_user_-usercustom']");
+
+		for (cu_i = 0; cu_i<cu_els.length; cu_i++) {
+			var cust_num = cu_els[cu_i].name.replace("_user_-usercustom","");
+			var cu_label = find_parent_with_type(cu_els[cu_i],"label");
+			cu_label.childNodes[0].nodeValue = cu_label.childNodes[0].nodeValue+" ("+cust_num+")";
+		}
+
+		function find_parent_with_type(element,type)
+		{
+			console.log(element,type);
+			while(element.parentElement.querySelector(type) == null){
+				element = element.parentElement;
+					console.log(element,type);
+
+			}
+			
+			return element.parentElement.querySelector(type);
+		}
+	}
+}
+
 //purge cache and refresh page
 function purge_server_cache() {
 	var purge_req = new XMLHttpRequest();
@@ -407,5 +434,5 @@ chrome.storage.sync.get(null, function(stored_options) {
 	}
 	
 	prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
-			
+	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
 });

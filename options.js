@@ -22,6 +22,7 @@ function save_options() {
   on_page_options["auto-repair-imp-exp-url"] = document.getElementById('auto-repair-imp-exp-url').checked;
   on_page_options["auto-repair-cus-conf-url"] = document.getElementById('auto-repair-cus-conf-url').checked;
   on_page_options["prepend-view-order-method-ids"] = document.getElementById('prepend-view-order-method-ids').checked;
+  on_page_options["append-id-to-cust-customer-fields"] = document.getElementById('append-id-to-cust-customer-fields').checked;
 		
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
@@ -58,6 +59,7 @@ function load_options() {
 			document.getElementById('auto-repair-imp-exp-url').checked = stored_options["auto-repair-imp-exp-url"];
 			document.getElementById('auto-repair-cus-conf-url').checked = stored_options["auto-repair-cus-conf-url"];
 			document.getElementById('prepend-view-order-method-ids').checked = stored_options["prepend-view-order-method-ids"];
+			document.getElementById('append-id-to-cust-customer-fields').checked = stored_options["append-id-to-cust-customer-fields"];
 	});
 }
 
