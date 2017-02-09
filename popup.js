@@ -36,6 +36,21 @@ document.addEventListener( "DOMContentLoaded", function() {
 		display_parent_fields();
 	});
 	
+	document.getElementById('options-link').addEventListener("click", function() {
+  if (chrome.runtime.openOptionsPage) {
+    // New way to open options pages, if supported (Chrome 42+).
+    chrome.runtime.openOptionsPage();
+  } else {
+    // Reasonable fallback.
+    window.open(chrome.runtime.getURL('options.html'));
+  }
+	});
+	
+	var group_btns = document.querySelectorAll("[data-group-button]");
+	for (var gb_i = 0; gb_i < group_btns.length; gb_i++) {
+		group_btns[gb_i].addEventListener("click", bind_group_select());
+	}
+	
 	get_filter_url();
 });
 
@@ -136,4 +151,20 @@ function display_parent_fields() {
 
 function update_results(result) {
 	document.getElementsByName("filter-url")[0].value=result;
+}
+
+function bind_group_select() {
+	return function() {
+		var btn_group = this.getAttribute("data-group-button");
+		
+		var all_btns = document.querySelectorAll("[data-group]");
+		for (var ab_i = 0; ab_i < all_btns.length; ab_i++) {
+			all_btns[ab_i].style.display="none";
+		}
+
+		var vis_btns = document.querySelectorAll("[data-group~='"+btn_group+"']");
+		for (var vb_i = 0; vb_i < vis_btns.length; vb_i++) {
+			vis_btns[vb_i].style.display="block";
+		}
+	}
 }
