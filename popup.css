@@ -37,7 +37,7 @@ textarea {
   white-space:nowrap;
   border: solid 1px;
   border-left:none;
-  transition: width 0.5s;
+  transition: width 0.5s, background 0.5s;
   border-radius: 0 5px 5px 0;
   background:#F5F5F5;
   color:#031b24;
@@ -58,10 +58,11 @@ textarea {
   padding-right:5px;
   background:#DCDCDC;
 }
-.side-bar .menu-opt:hover .title{
-}
 .btn-col button:hover{
 	background:#0D91BF;
+}
+.side-bar .menu-opt.active, .side-bar .active.menu-opt:hover{
+ background:#26AAD8;
 }
 .clear{
 	clear:both;

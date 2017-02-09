@@ -155,13 +155,25 @@ function update_results(result) {
 
 function bind_group_select() {
 	return function() {
+		// what group was clicked
 		var btn_group = this.getAttribute("data-group-button");
 		
+		//unactivate all the menu buttons
+		var all_btns = document.querySelectorAll("[data-group-button]");
+		for (var ab_i = 0; ab_i < all_btns.length; ab_i++) {
+			all_btns[ab_i].className=all_btns[ab_i].className.replace(/[\b ]active\b/g,"");
+		}
+		
+		//actiate the clicked menu button
+		this.className+=" active";
+		
+		//hide all functinoal mbuttons
 		var all_btns = document.querySelectorAll("[data-group]");
 		for (var ab_i = 0; ab_i < all_btns.length; ab_i++) {
 			all_btns[ab_i].style.display="none";
 		}
 
+		// dislay all functional buttons in appropriate group
 		var vis_btns = document.querySelectorAll("[data-group~='"+btn_group+"']");
 		for (var vb_i = 0; vb_i < vis_btns.length; vb_i++) {
 			vis_btns[vb_i].style.display="block";
