@@ -36,6 +36,11 @@ document.addEventListener( "DOMContentLoaded", function() {
 		display_parent_fields();
 	});
 	
+	document.getElementById("generate-zone-links").addEventListener("click", function () {
+		generate_zone_links();
+	});
+	
+	
 	document.getElementById('options-link').addEventListener("click", function() {
   if (chrome.runtime.openOptionsPage) {
     // New way to open options pages, if supported (Chrome 42+).
@@ -146,6 +151,13 @@ function display_parent_fields() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want parent fields made visible");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "display-parent-fields"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function generate_zone_links() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want to generate zone links");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "generate-zone-links"}, function(response) {update_results(response.status)});  
 	});
 }
 

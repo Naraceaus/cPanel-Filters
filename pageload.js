@@ -28,6 +28,9 @@ function process_message(request, sender, sendResponse) {
 		case "display-parent-fields":
 			sendResponse({target:"popup",title:"display-parent-fields",status:display_parent_fields()});
 			break;
+		case "generate-zone-links":
+			sendResponse({target:"popup",title:"generate-zone-links",status:generate_zone_links()});
+			break;
 		
 		default:
 	}
@@ -318,6 +321,31 @@ function display_parent_fields() {
 		return "Displayed "+num_hidden_fields+" parent fields";
 	}
 	return "No parent fields to display, make sure your active";
+}
+
+// add link shipping zones on services and rates
+function generate_zone_links() {
+	var zone_rows = document.querySelectorAll("[id*='znrow']");
+
+	var num_zones_updated = 0;
+	for (var zr_i = 0; zr_i < zone_rows.length; zr_i++) {
+		var zone_row = zone_rows[zr_i];
+		var zone_el_ref = zone_row.id.replace("znrow","");
+		var zone_id = document.querySelector("[name='ra_zone"+zone_el_ref+"']").value;
+		var code_element = document.getElementById("zncode"+zone_el_ref);
+		if (code_element.firstChild.nodeName == "#text") {
+			var zone_link = document.createElement("a");
+			zone_link.innerText = code_element.innerText;
+			zone_link.href = window.location.protocol+"//"+window.location.host+"/_cpanel/zone/view?id="+zone_id;
+			code_element.replaceChild(zone_link, code_element.firstChild);
+			num_zones_updated++;
+		}
+	}
+	
+	if (num_zones_updated > 0) {
+		return "Converted "+num_zones_updated+" zones to links";
+	}
+	return "No zone links to convert";
 }
 
 // Page Load Automations
