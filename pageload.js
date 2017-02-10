@@ -31,6 +31,9 @@ function process_message(request, sender, sendResponse) {
 		case "generate-zone-links":
 			sendResponse({target:"popup",title:"generate-zone-links",status:generate_zone_links()});
 			break;
+		case "mark-orderlines-for-shipping":
+			sendResponse({target:"popup",title:"mark-orderlines-for-shipping",status:mark_orderlines_for_shipping()});
+			break;
 		
 		default:
 	}
@@ -346,6 +349,30 @@ function generate_zone_links() {
 		return "Converted "+num_zones_updated+" zones to links";
 	}
 	return "No zone links to convert";
+}
+
+function mark_orderlines_for_shipping() {
+	var lines_to_ship = document.querySelectorAll("[id*=line-_rshq]");
+	var orderlines_shipped = 0;
+	for (var li = 0;li<lines_to_ship.length; li++) {
+		var cur_line = lines_to_ship[li];
+		var line_id = cur_line.id.replace("line-_rshq","");
+		var qty = document.getElementsByName("_itm_qty"+line_id)[0].value;
+		cur_line.value = qty;
+		
+		// trigger change event
+		var change_event = document.createEvent("HTMLEvents");
+		change_event.initEvent("change", false, true);
+		cur_line.dispatchEvent(change_event);
+		
+		orderlines_shipped++;
+	}
+	
+	if (num_zones_updated > 0) {
+		return "Marked "+num_zones_updated+" orderlines for shipping";
+	}
+	return "There are no orderlines to mark for shipping";
+	
 }
 
 // Page Load Automations

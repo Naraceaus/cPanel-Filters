@@ -40,6 +40,9 @@ document.addEventListener( "DOMContentLoaded", function() {
 		generate_zone_links();
 	});
 	
+	document.getElementById("mark-orderlines-for-shipping").addEventListener("click", function () {
+		mark_orderlines_for_shipping();
+	});
 	
 	document.getElementById('options-link').addEventListener("click", function() {
   if (chrome.runtime.openOptionsPage) {
@@ -158,6 +161,13 @@ function generate_zone_links() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to generate zone links");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "generate-zone-links"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function mark_orderlines_for_shipping() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want to mark orderlines for shipping");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "mark-orderlines-for-shipping"}, function(response) {update_results(response.status)});  
 	});
 }
 
