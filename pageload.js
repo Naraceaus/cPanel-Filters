@@ -34,6 +34,9 @@ function process_message(request, sender, sendResponse) {
 		case "mark-orderlines-for-shipping":
 			sendResponse({target:"popup",title:"mark-orderlines-for-shipping",status:mark_orderlines_for_shipping()});
 			break;
+		case "add-sh-cat-to-rates":
+			sendResponse({target:"popup",title:"add-sh-cat-to-rates",status:add_sh_cat_to_rates()});
+			break;
 		
 		default:
 	}
@@ -349,6 +352,34 @@ function generate_zone_links() {
 		return "Converted "+num_zones_updated+" zones to links";
 	}
 	return "No zone links to convert";
+}
+
+function add_sh_cat_to_rates(){
+	click_ad_sh_cat();
+	var num_cat_added=1;
+	var latestElement = 0;
+
+	for (var i=0;document.getElementsByName("lnk_shid"+i).length>0;i++) {
+		latestElement=i;
+	}
+
+	var numCats=document.getElementsByName("lnk_shid"+parseInt(latestElement))[0].length;
+	for (var j=1;j<=numCats-1;j++) {
+		console.log(latestElement+j-1);
+		document.getElementsByName("lnk_shid"+parseInt(latestElement+j-1))[0].selectedIndex=j;
+		if (j!=numCats-1) {
+			click_ad_sh_cat();
+			num_cat_added++;
+		}
+	}
+
+	return num_cat_added+" category(-y+ies) added to rates";
+	
+	function click_ad_sh_cat() {
+		var change_event = document.createEvent("HTMLEvents");
+		change_event.initEvent("click", false, true);
+		document.querySelector("[onclick='addShm()']").dispatchEvent(change_event);
+	}
 }
 
 function mark_orderlines_for_shipping() {

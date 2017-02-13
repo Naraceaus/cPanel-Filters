@@ -44,6 +44,10 @@ document.addEventListener( "DOMContentLoaded", function() {
 		mark_orderlines_for_shipping();
 	});
 	
+	document.getElementById("add-sh-cat-to-rates").addEventListener("click", function () {
+		add_sh_cat_to_rates();
+	});
+	
 	document.getElementById('options-link').addEventListener("click", function() {
   if (chrome.runtime.openOptionsPage) {
     // New way to open options pages, if supported (Chrome 42+).
@@ -168,6 +172,13 @@ function mark_orderlines_for_shipping() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to mark orderlines for shipping");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "mark-orderlines-for-shipping"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function add_sh_cat_to_rates() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want to categories to shipping rates");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "add-sh-cat-to-rates"}, function(response) {update_results(response.status)});  
 	});
 }
 
