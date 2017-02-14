@@ -263,55 +263,52 @@ function append_id_to_cust_customer_fields(enabled) {
 
 //purge cache and refresh page
 function purge_server_cache() {
-	var purge_req = new XMLHttpRequest();
-	purge_req.onreadystatechange = function() {
-					if (purge_req.readyState == XMLHttpRequest.DONE ) {
-								if (purge_req.status == 200) {
-									if (purge_req.responseText == "NSD1;#1|$2|ok$1|1") {
-												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Cache Purged"}, function() {});
-												location.reload();
-									} else {
-												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Purging Cache Failed. Please make sure this is a Neto site and you are logged into the control panel"}, function() {});
-									}
-								}
-								else if (purge_req.status == 400) {
-											chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"400 Error, Bad Data"}, function() {});
-								}
-								else {m
-												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:purge_req.status+" Unknown Error"}, function() {});
-								}
-					}
-	};
-
-	purge_req.open("POST","https://"+window.location.host+"/_cpanel", true);
-	purge_req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-	purge_req.send("ajaxfn=system_refresh&ajax=y");
-	
+	make_ajax_request("/_cpanel","ajaxfn=system_refresh&ajax=y",purge_server_sucessful);
 	return "Purging Cache, page will refresh once cache is purged";
+}
+
+function purge_server_sucessful(ajax_response){
+	if (ajax_response.responseText == "NSD1;#1|$2|ok$1|1") {
+				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Cache Purged"}, function() {});
+				location.reload();
+	} else {
+				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Unkown Error Occured. Send this to administrator: "+ajax_response.responseText}, function() {});
+				location.reload();
+	}
 }
 
 //heavily purge cache including querystring appended to js and css files allowing those fields to be purged on all machines
 function heavily_purge_server_cache() {
-	var heavy_purge_req = new XMLHttpRequest();
-	heavy_purge_req.onreadystatechange = function() {
-					if (heavy_purge_req.readyState == XMLHttpRequest.DONE ) {
-								if (heavy_purge_req.status == 200) {
-									purge_server_cache();
+	make_ajax_request("/_cpanel","tkn=webshop&proc=edit&ajax=y",purge_server_cache);
+	return "Heavily Purging Cache, page will refresh once cache is purged";
+}
+
+function make_ajax_request(path,qry_str,success_func) {
+	var ajax_request = new XMLHttpRequest();
+	
+	ajax_request.onreadystatechange=function() {
+					if (ajax_request.readyState == XMLHttpRequest.DONE ) {
+								if (ajax_request.status == 200) {
+									if (ajax_request.responseText != "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
+												success_func(ajax_request);
+									} else {
+												chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"Server Request Failed. You are not logged into the cPanel. Please login to perfom this function"}, function() {});
+									}
 								}
-								else if (heavy_purge_req.status == 400) {
-											chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"400 Error, Bad Data"}, function() {});
+								else if (ajax_request.status == 400) {
+											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"400 Error, Bad Data"}, function() {});
 								}
-								else {m
-												chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:heavy_purge_req.status+" Unknown Error"}, function() {});
+								else if (ajax_request.status == 404) {
+											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"404 Error, This site does not have a cPanel"}, function() {});
+								}
+								else {
+												chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:ajax_request.status+" Unknown Error"}, function() {});
 								}
 					}
-	};
-
-	heavy_purge_req.open("POST","https://"+window.location.host+"/_cpanel", true);
-	heavy_purge_req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-	heavy_purge_req.send("tkn=webshop&proc=edit&ajax=y");
-	
-	return "Heavily Purging Cache, page will refresh once cache is purged";
+	}
+	ajax_request.open("POST","https://"+window.location.host+path, true);
+	ajax_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+	ajax_request.send(qry_str);
 }
 
 //on parent products display fields normally hidden from the user

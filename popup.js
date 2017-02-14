@@ -72,6 +72,7 @@ function process_message(request, sender, sendResponse) {
 
  switch (request.title) {
 		case "cache-purge":
+		case "ajax-result":
    update_results(request.status);
 			break;
   default:
