@@ -48,6 +48,10 @@ document.addEventListener( "DOMContentLoaded", function() {
 		add_sh_cat_to_rates();
 	});
 	
+	document.getElementById("gen_animal_binary").addEventListener("click", function () {
+		document.getElementById("console").value = convert_num_to_emoji(document.getElementById("console").value);
+	});
+	
 	document.getElementById('options-link').addEventListener("click", function() {
   if (chrome.runtime.openOptionsPage) {
     // New way to open options pages, if supported (Chrome 42+).
@@ -212,5 +216,56 @@ function bind_group_select() {
 		for (var vb_i = 0; vb_i < vis_btns.length; vb_i++) {
 			vis_btns[vb_i].style.display="block";
 		}
+	}
+}
+
+
+//dumb silly things
+function convert_num_to_emoji(input){
+	var output="";
+	var split_input = input.split(/(\d+)/);
+	for (var si = 0; si < split_input.length; si++) {
+		output+=gen_binary_emoji(split_input[si]);
+	}
+	return output;
+}
+
+
+function gen_binary_emoji(input) {
+	var emoji_ones = [
+		'sheep',
+		'bird',
+		'tiger',
+		'octopus',
+		'blowfish',
+		'beetle',
+		'dromedary_camel',
+		'wolf',
+		'snail',
+		'ram',
+		'boar',
+		'cow',
+		'cow2',
+		'tropical_fish',
+		'cat',
+		'cat2',
+		'scorpion',
+		'horse'
+	]
+
+	number = parseInt(input);
+	if (isNaN(number)) {
+		return input;
+		} else {
+		var num_bin = number.toString(2);
+		num_emj = "";
+		for (char=0; char<num_bin.length; char++) {
+			if (num_bin[char] == '0') {
+				num_emj+=":rainbowsheep:"
+			} else {
+				num_emj+=":"+emoji_ones[Math.floor((Math.random() * emoji_ones.length))]+":"
+			}
+		}
+		return num_emj;
 	}
 }
