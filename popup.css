@@ -3,7 +3,7 @@ html{
 }
 
 body {
-  width:440px;
+  width:480px;
 		background:white;
 }
 textarea {
@@ -11,13 +11,16 @@ textarea {
   height:100px;
 		resize:vertical;
 }
-.side-bar, .btn-col {
+.side-bar-left,.side-bar-right,.btn-col {
   float:left;
   position:relative;
   min-height:10px;
   margin-top:10px;
 }
-.side-bar {
+.side-bar-right{
+	float:right;
+}
+.side-bar-left, .side-bar-right {
   width:40px;
   z-index:200;
 }
@@ -25,22 +28,36 @@ textarea {
   width:400px;
   z-index:100;
 }
-.btn-col button,.side-bar .menu-opt {
+.btn-col button,.side-bar-left .menu-opt {
   float:left;
   margin-right:10px;
   padding:10px 0px;
 		cursor:pointer;
 }
-.side-bar .menu-opt{
+.side-bar-right .menu-opt {
+  float:right;
+  margin-left:10px;
+  padding:10px 0px;
+		cursor:pointer;
+}
+.side-bar-left .menu-opt,.side-bar-right .menu-opt{
   width: 31px;
   overflow:hidden;
   white-space:nowrap;
   border: solid 1px;
-  border-left:none;
   transition: width 0.5s, background 0.5s;
-  border-radius: 0 5px 5px 0;
   background:#F5F5F5;
   color:#031b24;
+}
+.side-bar-left .menu-opt{
+  border-left:none;
+		border-radius: 0 5px 5px 0;
+		direction:rtl;
+}
+.side-bar-right .menu-opt{
+  border-right:none;
+		border-radius: 5px 0 0 5px;
+		direction:ltr;
 }
 .btn-col button{
   width: 190px;
@@ -50,10 +67,10 @@ textarea {
   border:solid 1px #FFFFFF;
   border-radius:5px;
 }
-.side-bar .fa {
+.side-bar-left .fa,.side-bar-right .fa {
   width:30px;
 }
-.side-bar .menu-opt:hover {
+.side-bar-left .menu-opt:hover,.side-bar-right .menu-opt:hover {
   width:100px;
   padding-right:5px;
   background:#DCDCDC;
@@ -61,7 +78,7 @@ textarea {
 .btn-col button:hover{
 	background:#0D91BF;
 }
-.side-bar .menu-opt.active, .side-bar .active.menu-opt:hover{
+.side-bar-left .menu-opt.active, .side-bar-left .active.menu-opt:hover,.side-bar-right .menu-opt.active, .side-bar-right .active.menu-opt:hover{
  background:#26AAD8;
 }
 .clear{
