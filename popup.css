@@ -49,6 +49,12 @@ textarea {
   background:#F5F5F5;
   color:#031b24;
 }
+.side-bar-right .fa-reduce-margin{
+	margin-right:-15px;
+}
+.side-bar-left .fa-reduce-margin{
+	margin-left:-15px;
+}
 .side-bar-left .menu-opt{
   border-left:none;
 		border-radius: 0 5px 5px 0;
@@ -71,7 +77,7 @@ textarea {
   width:30px;
 }
 .side-bar-left .menu-opt:hover,.side-bar-right .menu-opt:hover {
-  width:100px;
+  width:130px;
   padding-right:5px;
   background:#DCDCDC;
 }

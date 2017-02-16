@@ -34,8 +34,11 @@ function process_message(request, sender, sendResponse) {
 		case "mark-orderlines-for-shipping":
 			sendResponse({target:"popup",title:"mark-orderlines-for-shipping",status:mark_orderlines_for_shipping()});
 			break;
-		case "add-sh-cat-to-rates":
-			sendResponse({target:"popup",title:"add-sh-cat-to-rates",status:add_sh_cat_to_rates()});
+		case "add-sh-cat-to-methods":
+			sendResponse({target:"popup",title:"add-sh-cat-to-methods",status:add_sh_cat_to_methods()});
+			break;
+		case "add-all-export-fields":
+			sendResponse({target:"popup",title:"add-all-export-fields",status:add_all_export_fields()});
 			break;
 		
 		default:
@@ -351,7 +354,7 @@ function generate_zone_links() {
 	return "No zone links to convert";
 }
 
-function add_sh_cat_to_rates(){
+function add_sh_cat_to_methods(){
 	click_ad_sh_cat();
 	var num_cat_added=1;
 	var latestElement = 0;
@@ -401,6 +404,50 @@ function mark_orderlines_for_shipping() {
 	}
 	return "There are no orderlines to mark for shipping";
 	
+}
+
+function add_all_export_fields() {
+	var num_fields_added=0;
+	function add_field() {
+		document.querySelector("[href='javascript:addFields();']").click();
+		num_fields_added++;
+		return document.querySelector(".itmlist [class*='row']:last-child [id*='opts_']");
+	}
+
+	function select_option(element, index) {
+		element.selectedIndex = index;
+		element.dispatchEvent(new Event('change'));
+	}
+
+	if (document.querySelector("[href='javascript:addFields();']") != null && document.querySelector('[href="javascript:proExport(\'Filter\')"]') != null) {
+		var cur_prim = add_field();
+		var cur_tag;
+		var num_prim_val = cur_prim.length;
+		for (var pi = 1; pi < num_prim_val; pi++) {
+			select_option(cur_prim,pi);
+			cur_tag = document.getElementById(cur_prim.id.replace("opts_","tag_"));
+			num_tags = cur_tag.length;
+			
+			if (cur_prim.value.includes("C")) {
+				select_option(cur_tag,cur_tag.querySelector("[value*='_ns']").index);
+				
+				cur_prim = add_field();
+				select_option(cur_prim,pi);
+				cur_tag = document.getElementById(cur_prim.id.replace("opts_","tag_"));
+				
+			} else {
+				for (ti=1; ti < num_tags; ti++) {
+					select_option(cur_tag,ti);			
+					cur_prim = add_field();
+					select_option(cur_prim,pi);
+					cur_tag = document.getElementById(cur_prim.id.replace("opts_","tag_"));
+				}
+			}
+		}
+		return "Added "+num_fields_added+" export fields to export wizard";
+	} else {
+		return "Error: Page not viable for adding export fields";
+	}
 }
 
 // Page Load Automations

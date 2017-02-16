@@ -44,12 +44,16 @@ document.addEventListener( "DOMContentLoaded", function() {
 		mark_orderlines_for_shipping();
 	});
 	
-	document.getElementById("add-sh-cat-to-rates").addEventListener("click", function () {
+	document.getElementById("add-sh-cat-to-methods").addEventListener("click", function () {
 		add_sh_cat_to_rates();
 	});
 	
 	document.getElementById("gen_animal_binary").addEventListener("click", function () {
 		document.getElementById("console").value = convert_num_to_emoji(document.getElementById("console").value);
+	});
+	
+	document.getElementById("add-all-export-fields").addEventListener("click", function () {
+		add_all_export_fields();
 	});
 	
 	document.getElementById('options-link').addEventListener("click", function() {
@@ -184,6 +188,14 @@ function add_sh_cat_to_rates() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to categories to shipping rates");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "add-sh-cat-to-rates"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function add_all_export_fields() {
+	update_results("Adding eport fields, the page may become unresponive for a brief period");
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" to add all the export fields to the export wizard");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "add-all-export-fields"}, function(response) {update_results(response.status)});  
 	});
 }
 
