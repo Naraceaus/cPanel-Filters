@@ -20,7 +20,6 @@
       </div>
       <div class="btn-col">
         <button id="refresh-filter" type="button" title="Refresh Filter" data-group="all cpanel product shipping">Regenerate Filter URL</button>
-        <button id="find-page" type="button" title="Find Page" data-group="all webstore">Find Page In Control Panel</button>
         <button id="highlight-adverts" type="button" title="Enable Highlight" data-group="all webstore">Place Advert Highlights</button>
         <button id="de-highlight-adverts" type="button" title="Disable Highlight" data-group="all webstore">Remove Advert Highlights</button>
         <button id="purge-cache" type="button" title="Purge Server Cache" data-group="all webstore">Purge Server Cache</button>
@@ -31,12 +30,21 @@
         <button id="add-sh-cat-to-methods" type="button" title="Add Ship Categories To Methods" data-group="all cpanel shipping order">Add Ship Categories To Methods</button>        
         <button id="add-all-export-fields" type="button" title="Add All Export Fields" data-group="all cpanel importexport">Add All Export Fields</button>        
         <button id="gen-animal-binary" type="button" title="Generate Animal Emoji Binary" data-group="miscellaneous" style="display: none;">Generate Animal Emoji Binary</button>        
-      </div>
+						</div>
+
 						<div class="side-bar-right">
 						  <a class="menu-opt" data-group-button="importexport"><span class="fa fa-fw fa-database fa-reduce-margin"></span><span class="fa fa-fw fa-arrows-h"></span><span class="title">Import/Export</span></a>
 						  <a class="menu-opt" data-group-button="miscellaneous"><span class="fa fa-fw fa-birthday-cake"></span><span class="title">Miscellaneous</span></a>
         <a class="menu-opt" id="options-link"><span class="fa fa-fw fa-cog"></span><span class="title">Options</span></a>
       </div>
+						<div id="page-info-spacer">
+									<div id="page-info-cont">
+									<div id="page-info-refresh"><span class="fa fa-fw fa-refresh"></span></div>
+										<div id="page-info-header"><span id="page-info-load-icon" class="fa fa-spinner fa-spin fa-fw"></span><span id="page-info-load-text">Page Information Is Loading</span></div>
+										
+										<div id="page-info"></div>
+									</div>
+						</div>
 						<div class="clear"></div>
     </body>
 </html>

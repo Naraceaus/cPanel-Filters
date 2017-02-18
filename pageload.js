@@ -40,6 +40,12 @@ function process_message(request, sender, sendResponse) {
 		case "add-all-export-fields":
 			sendResponse({target:"popup",title:"add-all-export-fields",status:add_all_export_fields()});
 			break;
+		case "get-page-info":
+			neto_page(function(text) {
+				chrome.runtime.sendMessage({target:"popup",title:"page-info",page_details:text},function() {});
+				
+			});
+			break;
 		
 		default:
 	}
@@ -252,10 +258,8 @@ function append_id_to_cust_customer_fields(enabled) {
 
 		function find_parent_with_type(element,type)
 		{
-			console.log(element,type);
 			while(element.parentElement.querySelector(type) == null){
 				element = element.parentElement;
-					console.log(element,type);
 
 			}
 			
@@ -274,9 +278,10 @@ function purge_server_sucessful(ajax_response){
 	if (ajax_response.responseText == "NSD1;#1|$2|ok$1|1") {
 				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Cache Purged"}, function() {});
 				location.reload();
+	} else if (ajax_response.responseText == "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
+				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Error: You are not logged into the cPanel. Please login before attempting to purge the cache"}, function() {});
 	} else {
 				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Unkown Error Occured. Send this to administrator: "+ajax_response.responseText}, function() {});
-				location.reload();
 	}
 }
 
@@ -286,26 +291,33 @@ function heavily_purge_server_cache() {
 	return "Heavily Purging Cache, page will refresh once cache is purged";
 }
 
-function make_ajax_request(path,qry_str,success_func) {
+function make_ajax_request(path,qry_str,success_func,fail_func) {
 	var ajax_request = new XMLHttpRequest();
 	
 	ajax_request.onreadystatechange=function() {
 					if (ajax_request.readyState == XMLHttpRequest.DONE ) {
 								if (ajax_request.status == 200) {
-									if (ajax_request.responseText != "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
-												success_func(ajax_request);
-									} else {
-												chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"Server Request Failed. You are not logged into the cPanel. Please login to perfom this function"}, function() {});
+									if (typeof(success_func) == "function") {
+										success_func(ajax_request);
 									}
 								}
 								else if (ajax_request.status == 400) {
 											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"400 Error, Bad Data"}, function() {});
+											if (typeof(fail_func) == "function") {
+												fail_func(ajax_request);
+											}
 								}
 								else if (ajax_request.status == 404) {
 											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"404 Error, This site does not have a cPanel"}, function() {});
+											if (typeof(fail_func) == "function") {
+												fail_func(ajax_request);
+											}
 								}
 								else {
-												chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:ajax_request.status+" Unknown Error"}, function() {});
+											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:ajax_request.status+" Unknown Error"}, function() {});
+											if (typeof(fail_func) == "function") {
+												fail_func(ajax_request);
+											}
 								}
 					}
 	}
@@ -365,7 +377,6 @@ function add_sh_cat_to_methods(){
 
 	var numCats=document.getElementsByName("lnk_shid"+parseInt(latestElement))[0].length;
 	for (var j=1;j<=numCats-1;j++) {
-		console.log(latestElement+j-1);
 		document.getElementsByName("lnk_shid"+parseInt(latestElement+j-1))[0].selectedIndex=j;
 		if (j!=numCats-1) {
 			click_ad_sh_cat();

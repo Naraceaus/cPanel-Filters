@@ -19,14 +19,57 @@ textarea {
 }
 .side-bar-right{
 	float:right;
+	width:32px;
+}
+.side-bar-left{
+	width:40px;
 }
 .side-bar-left, .side-bar-right {
-  width:40px;
-  z-index:200;
+  z-index:20;
 }
 .btn-col {
-  width:400px;
-  z-index:100;
+  width:408px;
+}
+#page-info-spacer{
+	height:38px;
+	float: left;
+	width:400px;
+}
+#page-info-header{
+	height: 17px;
+	padding: 10px;
+	text-align: center;
+}
+#page-info-refresh{
+	right:0px;
+	bottom:0px;
+	padding: 10px;
+	position: absolute;
+	height:17px;
+	cursor:pointer;
+	z-index:30;
+}
+#page-info-cont{
+	z-index:10;
+	width:397px;
+	border: solid 1px;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+	position:absolute;
+	bottom:7px;
+	left:48px;
+	max-height:37px;
+	overflow:hidden;
+	transition: max-height 1s;
+	background: #F5F5F5;
+ color: #031b24;
+	
+}
+#page-info-cont:hover{
+	max-height:200px;
+}
+#page-info{
+	padding: 0px 10px;
 }
 .btn-col button,.side-bar-left .menu-opt {
   float:left;
@@ -66,7 +109,7 @@ textarea {
 		direction:ltr;
 }
 .btn-col button{
-  width: 190px;
+  width: 194px;
   margin-bottom:10px;
   background:#26AAD8;
   color:#FFFFFF;

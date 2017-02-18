@@ -12,10 +12,6 @@ document.addEventListener( "DOMContentLoaded", function() {
 		get_filter_url();
 	});
 	
-	document.getElementById("find-page").addEventListener("click", function () {
-		find_page_in_cpanel();
-	});
-	
 	document.getElementById("highlight-adverts").addEventListener("click", function () {
 		highlight_ads();
 	});
@@ -48,7 +44,7 @@ document.addEventListener( "DOMContentLoaded", function() {
 		add_sh_cat_to_rates();
 	});
 	
-	document.getElementById("gen_animal_binary").addEventListener("click", function () {
+	document.getElementById("gen-animal-binary").addEventListener("click", function () {
 		document.getElementById("console").value = convert_num_to_emoji(document.getElementById("console").value);
 	});
 	
@@ -72,6 +68,11 @@ document.addEventListener( "DOMContentLoaded", function() {
 	}
 	
 	get_filter_url();
+	
+	get_page_info();
+	document.getElementById("page-info-refresh").addEventListener("click", function() {
+		get_page_info();
+	});
 });
 
 function process_message(request, sender, sendResponse) {
@@ -83,8 +84,31 @@ function process_message(request, sender, sendResponse) {
 		case "ajax-result":
    update_results(request.status);
 			break;
+		case "page-info":
+			print_page_info(request.page_details)
+
+			break;
   default:
  }
+}
+
+function get_page_info() {
+	document.getElementById("page-info-load-icon").className = document.getElementById("page-info-load-icon").className.replace("fa-check","fa-spinner")+" fa-spin";
+	document.getElementById("page-info-load-text").innerHTML = "Page Information Is Loading";
+	document.getElementById("page-info").style.filter = "blur(5px)";
+	
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want filter URL");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "get-page-info"}, function(response) {});  
+	});
+}
+
+function print_page_info(info) {
+	document.getElementById("page-info-load-icon").className = document.getElementById("page-info-load-icon").className.replace("fa-spinner","fa-check").replace(/ *fa-spin/g,"");
+	document.getElementById("page-info-load-text").innerHTML = "Page Information";
+	document.getElementById("page-info").innerHTML = info;
+	document.getElementById("page-info").style.filter = "blur(0)";
+
 }
 
 function get_filter_url() {
@@ -100,13 +124,6 @@ function print_filter_url(response) {
 	} else {
 		update_results("Error: Please refresh the active tab");
 	}
-}
-
-function find_page_in_cpanel() {
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-		console.log("tell "+tabs[0].id+" I want to find page in cPanel");
-		chrome.tabs.sendMessage(tabs[0].id, {title: "find-page-in-cpanel"}, function(response) {print_found_cpanel_url(response);});  
-	});
 }
 
 function print_found_cpanel_url(response) {

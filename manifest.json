@@ -3,7 +3,7 @@
 
   "name": "cPanel Helper",
   "description": "A series of small functions that make using the Neto cPanel simpler",
-  "version": "2.5",
+  "version": "3",
 		"options_ui":{
 			"page":"options.html",
 			"chrome_style": true
@@ -19,7 +19,7 @@
 		"content_scripts": [
 			{
 					"matches": ["<all_urls>"],
-					"js": ["pageload.js"],
+					"js": ["pageinfo.js","pageload.js"],
 					"run_at": "document_end"
 			}
   ],
