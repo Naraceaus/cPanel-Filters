@@ -124,8 +124,8 @@ function neto_page(finished_func) {
 	this.gen_sum_span = function() {
 		sum="";
 		sum+="<span>Active Page: "+this.full_url+"</span><br>"
-		sum+="<span>Is Neto Site: "+this.is_neto+"</span><br>"
-		sum+="<span>Logged Into cPanel: "+this.logged_in+"</span><br>"
+		sum+="<span>Is Neto Site: "+bool_to_fa_check(this.is_neto)+"</span><br>"
+		sum+="<span>Logged Into cPanel: "+bool_to_fa_check(this.logged_in)+"</span><br>"
 		if (this.type!="") {
 			sum+="<span>Page Type: "+this.type+"</span><br>"
 		}
@@ -140,6 +140,17 @@ function neto_page(finished_func) {
 		}
 		
 		return sum;
+	}
+	
+	function bool_to_fa_check(value) {
+		if (typeof(value)=="boolean") {
+			if (value) {
+				return "<span class='fa fa-fw fa-check'></span>";
+			} else {
+				return "<span class='fa fa-fw fa-times'></span>";
+			}
+		}
+		return value;
 	}
 	
 	this.initialise = function() {
