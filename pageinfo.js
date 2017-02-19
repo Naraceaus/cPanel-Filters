@@ -57,7 +57,7 @@ function neto_page(finished_func) {
 				this.type = "Webstore";
 				
 				//check body element for page type
-				var page_body = document.querySelector("body[class*='n_']");
+				var page_body = document.querySelector("body[id*='n_']");
 				if (page_body != null) {
 					this.sub_type = page_body.id.replace("n_","");
 					this.check_finished_then_func("get_type");
