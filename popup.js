@@ -41,7 +41,7 @@ document.addEventListener( "DOMContentLoaded", function() {
 	});
 	
 	document.getElementById("add-sh-cat-to-methods").addEventListener("click", function () {
-		add_sh_cat_to_rates();
+		add_sh_cat_to_methods();
 	});
 	
 	document.getElementById("gen-animal-binary").addEventListener("click", function () {
@@ -201,10 +201,10 @@ function mark_orderlines_for_shipping() {
 	});
 }
 
-function add_sh_cat_to_rates() {
+function add_sh_cat_to_methods() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-		console.log("tell "+tabs[0].id+" I want to categories to shipping rates");
-		chrome.tabs.sendMessage(tabs[0].id, {title: "add-sh-cat-to-rates"}, function(response) {update_results(response.status)});  
+		console.log("tell "+tabs[0].id+" I want to categories to shipping methods");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "add-sh-cat-to-methods"}, function(response) {update_results(response.status)});  
 	});
 }
 

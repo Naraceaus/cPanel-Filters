@@ -384,7 +384,7 @@ function add_sh_cat_to_methods(){
 		}
 	}
 
-	return num_cat_added+" category(-y+ies) added to rates";
+	return num_cat_added+" category(-y+ies) added to methods";
 	
 	function click_ad_sh_cat() {
 		var change_event = document.createEvent("HTMLEvents");
@@ -410,8 +410,8 @@ function mark_orderlines_for_shipping() {
 		orderlines_shipped++;
 	}
 	
-	if (num_zones_updated > 0) {
-		return "Marked "+num_zones_updated+" orderlines for shipping";
+	if (orderlines_shipped > 0) {
+		return "Marked "+orderlines_shipped+" orderlines for shipping";
 	}
 	return "There are no orderlines to mark for shipping";
 	
