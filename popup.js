@@ -86,16 +86,19 @@ function process_message(request, sender, sendResponse) {
 			break;
 		case "page-info":
 			print_page_info(request.page_details)
-
 			break;
-  default:
+		case "page-info-item":
+			update_page_info(request)
+			break;
+
+			default:
  }
 }
 
 function get_page_info() {
 	document.getElementById("page-info-load-icon").className = document.getElementById("page-info-load-icon").className.replace("fa-check","fa-spinner")+" fa-spin";
 	document.getElementById("page-info-load-text").innerHTML = "Page Information Is Loading";
-	document.getElementById("page-info").style.filter = "blur(5px)";
+	//document.getElementById("page-info").style.filter = "blur(5px)";
 	
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want filter URL");
@@ -108,7 +111,68 @@ function print_page_info(info) {
 	document.getElementById("page-info-load-text").innerHTML = "Page Information";
 	document.getElementById("page-info").innerHTML = info;
 	document.getElementById("page-info").style.filter = "blur(0)";
+}
 
+function update_page_info(request) {
+	console.log(request);
+	switch (request.name) {
+		case "act-page-url":
+		case "cpanel-link":
+			update_info_link(request.name, request.value);
+			break;
+		
+		case "page-type":
+		case "page-subtype":
+		case "default-theme":
+		case "active-theme":
+			update_info_text(request.name, request.value);
+			break;
+			
+		case "is-neto":
+		case "logged-in":
+		case "page-info-load-icon":
+			update_info_bool(request.name, request.value);
+			break;
+
+	}
+	
+	if (request.show_load == false) {
+		document.getElementById(request.name).className = document.getElementById(request.name).className.replace(/[ ]*fa-spin/,"").replace(/[ ]*fa-spinner/,"");
+	} else if (request.show_load == true) {
+		document.getElementById(request.name).className = document.getElementById(request.name).className.replace(/[ ]*fa-spin/,"").replace(/[ ]*fa-spinner/,"");
+		document.getElementById(request.name).className = document.getElementById(request.name).className + " fa-spin fa-spinner";
+	}
+	if (request.hide == true) {
+		document.getElementById(request.name).style.display="none";
+		document.getElementById(request.name+"-label").style.display="none";
+	} else if (request.hide == false) {
+		document.getElementById(request.name).style.display="initial";
+		document.getElementById(request.name+"-label").style.display="initial";
+	}
+}
+
+function update_info_link(id, value) {
+	if (value!="" && value!=null) {
+		document.getElementById(id).href = value;
+		document.getElementById(id).innerHTML = value;
+	} else {
+		document.getElementById(id).href = "";
+		document.getElementById(id).innerHTML = "n.a.";
+	}
+}
+
+function update_info_text(id, value) {
+	document.getElementById(id).innerHTML = value;
+}
+
+function update_info_bool(id, value) {
+	if (value == true) {
+		document.getElementById(id).className = document.getElementById(id).className.replace(/[ ]*fa-[a-zA-z]*/g,"");
+		document.getElementById(id).className = document.getElementById(id).className + " fa-check fa-fw";
+	} else if (value == false) {
+		document.getElementById(id).className = document.getElementById(id).className.replace(/[ ]*fa-[a-zA-z]*/g,"");
+		document.getElementById(id).className = document.getElementById(id).className + " fa-times fa-fw";
+	}
 }
 
 function get_filter_url() {

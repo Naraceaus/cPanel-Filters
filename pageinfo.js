@@ -1,4 +1,4 @@
-function neto_page(finished_func) {
+function neto_page(finished_func, info_target) {
 	this.tasks_complete = function() {
 		task_keys = Object.keys(this.tasks);
 		var finished = true;
@@ -6,39 +6,64 @@ function neto_page(finished_func) {
 			if (!this.tasks[task_keys[ki]]) {
 				finished = false;
 			}
-		}
-		
+		}		
 		return finished;
 	}
 	
-	this.check_finished_then_func = function(just_finished) {
-		if (just_finished != "" && just_finished != null ) {
-			this.tasks[just_finished] = true;
+	this.update_popup_info = function(name, value, show_load, hide) {
+		if (this.info_target!=null) {
+			chrome.runtime.sendMessage({target:"popup",title:"page-info-item",name:name,value:value,show_load:show_load,hide:hide},function() {});
+		}
+		
+	}
+	
+	this.update_info_entry = function(id, value) {
+		if (id!="" && id!=null) {
+			this[id] = value;
+			this.tasks[id] = true;
 		}
 		if (this.tasks_complete()) {
-			this.finished_func(this.gen_sum_span());
+			update_popup_info("page-info-load-icon",true,false,false);
+			this.finished_func(this);
+		}
+		this.update_popup_info(id, value, false, false);
+	}
+	
+	this.process_webstore_response = function(response){
+		var webstore_page = response.responseText;
+		var res_cont = document.createElement("div");
+		res_cont.innerHTML = webstore_page;
+		theme_ident_el = res_cont.querySelector("[value='TEMPLATELANG']");
+		console.log(theme_ident_el);
+		if (theme_ident_el!=null) {
+			var theme_sel_name = theme_ident_el.name.replace("cfg","cfgval");
+			update_info_entry("default-theme",res_cont.querySelector("[name='"+theme_sel_name+"']").value);
+		} else {
+			update_info_entry("default-theme","n.a.");
 		}
 	}
 	
 	
 	//checking if logged in and is a neto site
 	this.success_ajax = function(ajax_response) {
-		this.is_neto = true;
+		update_info_entry("is-neto", true)
 		if (ajax_response.responseText == "NSD1;#2|$7|content$0|$3|msg$0|") {
-			this.logged_in = true
+			update_info_entry("logged-in", true);
+			make_ajax_request("/_cpanel/setup_wizard/webshopconfig","",this.process_webstore_response,null,true);
 		} else if (ajax_response.responseText == "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
-			this.logged_in = false;
+			update_info_entry("logged-in", false)
+			update_info_entry("default-theme","n.a.");
 		} else {
-			this.logged_in = "Addon is confused, contact developer with the website you are viewing"
+			//todo errors for bool
+			//this.logged_in = "Addon is confused, contact developer with the website you are viewing"
 		}
-		this.check_finished_then_func("check_ajax");
 		this.get_page_info();
 	}
 	
 	this.fail_ajax = function(ajax_response) {
-		this.is_neto = false;
-		this.logged_in = "n.a.";
-		this.check_finished_then_func("check_ajax");
+		update_info_entry("is-neto",false);
+		update_info_entry("logged-in",false);
+		update_info_entry("default-theme","n.a.");
 		this.get_page_info();
 	}
 	
@@ -48,20 +73,19 @@ function neto_page(finished_func) {
 	
 	//checking page type
 	this.get_page_info = function() {
-		if (this.is_neto) {
+		if (this["is-neto"]) {
 			if (window.location.pathname.match("_cpanel") || window.location.pathname.match("cgi-bin/suppliers/index.cgi")) {
-				this.type = "cPanel";
-				this.check_finished_then_func("get_type");
-				this.check_finished_then_func("gen_cpanel_url");
+				update_info_entry("page-type","cPanel");
+				update_info_entry("cpanel-link",window.location.href);
 			} else {
-				this.type = "Webstore";
+				update_info_entry("page-type","Webstore");
 				
 				//check body element for page type
 				var page_body = document.querySelector("body[id*='n_']");
 				if (page_body != null) {
-					this.sub_type = page_body.id.replace("n_","");
-					this.check_finished_then_func("get_type");
-					if (this.logged_in) {
+					update_info_entry("page-subtype",page_body.id.replace("n_",""));
+					update_info_entry("active-theme",page_body.className.replace("n_",""));
+					if (this["logged-in"]) {
 						switch (this.sub_type) {
 							case "customer_account":
 								make_ajax_request("/_myacct/edit_account","",logged_in_customer_email);
@@ -74,26 +98,22 @@ function neto_page(finished_func) {
 								break;
 						}
 					} else {
-						this.cPanel_link = find_url_in_cpanel();
-						this.check_finished_then_func("gen_cpanel_url");
+						update_info_entry("cpanel-link",find_url_in_cpanel());
 					}
 					
 					
 				} else {
-					this.type = "n.a.";
-					this.sub_type = "n.a.";
-					this.check_finished_then_func("get_type");
-					this.check_finished_then_func("gen_cpanel_url");
+					update_info_entry("page-type","n.a.");
+					update_info_entry("page-subtype","n.a.");
+					update_info_entry("active-theme",("n.a."));
 				}
-				
-				
 			}
 		} else {
-			this.sub_type = "n.a.";
-			this.check_finished_then_func("get_type");
-			this.check_finished_then_func("gen_cpanel_url");
+			update_info_entry("active-theme","n.a.");
+			update_info_entry("page-type","n.a.");
+			update_info_entry("page-subtype","n.a.");
+			update_info_entry("cpanel-link","n.a.");
 		}
-		
 	}
 	
 	this.logged_in_customer_email = function(request) {
@@ -103,8 +123,7 @@ function neto_page(finished_func) {
 		page_cont.innerHTML = page_returned;
 		
 		var email = page_cont.querySelector("[name='email']").value;
-		this.cPanel_link = window.location.origin+"/_cpanel/customer?_ftr_email="+email;
-		this.check_finished_then_func("gen_cpanel_url");
+		update_info_entry("cpanel-link", window.location.origin+"/_cpanel/customer?_ftr_email="+email);
 	}
 
 	this.find_direct_url_in_cpanel = function(request) {
@@ -114,32 +133,10 @@ function neto_page(finished_func) {
 		table_cont.innerHTML = table_text;
 		var link_el = table_cont.querySelector("[href*='_cpanel']");
 		if (link_el!=null) {
-			this.cPanel_link = table_cont.querySelector("[href*='_cpanel']").href;
+			update_info_entry("cpanel-link", table_cont.querySelector("[href*='_cpanel']").href);
 		} else {
-			this.cPanel_link = "";
+			update_info_entry("cpanel-link","");
 		}
-		this.check_finished_then_func("gen_cpanel_url");
-	}
-	
-	this.gen_sum_span = function() {
-		sum="";
-		sum+="<span>Active Page: "+this.full_url+"</span><br>"
-		sum+="<span>Is Neto Site: "+bool_to_fa_check(this.is_neto)+"</span><br>"
-		sum+="<span>Logged Into cPanel: "+bool_to_fa_check(this.logged_in)+"</span><br>"
-		if (this.type!="") {
-			sum+="<span>Page Type: "+this.type+"</span><br>"
-		}
-		if (this.sub_type!="") {
-			sum+="<span>Page SubType: "+this.sub_type+"</span><br>"
-		}
-		if (this.identifier.value!="") {
-			sum+="<span>"+this.identifier.prefix+": "+this.identifier.value+"</span><br>"
-		}
-		if (this.cPanel_link != "") {
-			sum+="<a href='"+this.cPanel_link+"' target='_blank'>Link to cPanel</a><br>"
-		}
-		
-		return sum;
 	}
 	
 	function bool_to_fa_check(value) {
@@ -155,18 +152,26 @@ function neto_page(finished_func) {
 	
 	this.initialise = function() {
 		this.finished_func = finished_func;
-		this.full_url=window.location.href;
-		this.is_neto = false;
-		this.logged_in = false;
-		this.type="";
-		this.sub_type="";
-		this.identifier = {prefix:"",value:""};
-		this.cPanel_link = "";
+		this.info_target=info_target;
+
 		this.tasks = {
-			check_ajax:false,
-			get_type:false,
-			gen_cpanel_url:false
+			"act-page-url":false,
+			"cpanel-link":false,
+			"default-theme":false,
+			"active-theme":false,
+			"page-type":false,
+			"page-subtype":false,
+			"is-neto":false,
+			"logged-in":false
 		};
+		
+		this.update_info_entry("act-page-url",window.location.href,false,false);
+		this["cpanel-link"]="",
+		this["page-type"]="",
+		this["page-subtype"]="",
+		this["is-neto"]=false,
+		this["logged-in"]=false
+
 		
 		this.check_for_cpanel();
 	}

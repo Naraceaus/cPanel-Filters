@@ -41,10 +41,11 @@ function process_message(request, sender, sendResponse) {
 			sendResponse({target:"popup",title:"add-all-export-fields",status:add_all_export_fields()});
 			break;
 		case "get-page-info":
-			neto_page(function(text) {
-				chrome.runtime.sendMessage({target:"popup",title:"page-info",page_details:text},function() {});
+			//neto_page(function(text) {
+			//	chrome.runtime.sendMessage({target:"popup",title:"page-info",page_details:text},function() {});
 				
-			});
+			//});
+			neto_page(function(){},"page-info");
 			break;
 		
 		default:
@@ -291,7 +292,7 @@ function heavily_purge_server_cache() {
 	return "Heavily Purging Cache, page will refresh once cache is purged";
 }
 
-function make_ajax_request(path,qry_str,success_func,fail_func) {
+function make_ajax_request(path,qry_str,success_func,fail_func,is_get) {
 	var ajax_request = new XMLHttpRequest();
 	
 	ajax_request.onreadystatechange=function() {
@@ -321,7 +322,13 @@ function make_ajax_request(path,qry_str,success_func,fail_func) {
 								}
 					}
 	}
-	ajax_request.open("POST","https://"+window.location.host+path, true);
+
+	var	post_get_value = "POST";
+	if (is_get==true) {
+		post_get_value = "GET";
+	}
+
+	ajax_request.open(post_get_value,"https://"+window.location.host+path, true);
 	ajax_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
 	ajax_request.send(qry_str);
 }
