@@ -44,6 +44,10 @@ document.addEventListener( "DOMContentLoaded", function() {
 		add_sh_cat_to_methods();
 	});
 	
+	document.getElementById("prepend-ship-ser-id").addEventListener("click", function () {
+		prepend_ship_ser_id();
+	});
+	
 	document.getElementById("gen-animal-binary").addEventListener("click", function () {
 		document.getElementById("console").value = convert_num_to_emoji(document.getElementById("console").value);
 	});
@@ -272,6 +276,13 @@ function add_sh_cat_to_methods() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" I want to categories to shipping methods");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "add-sh-cat-to-methods"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function prepend_ship_ser_id() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" I want to prepend ids to shipping services");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "prepend-ship-ser-id"}, function(response) {update_results(response.status)});  
 	});
 }
 

@@ -40,11 +40,10 @@ function process_message(request, sender, sendResponse) {
 		case "add-all-export-fields":
 			sendResponse({target:"popup",title:"add-all-export-fields",status:add_all_export_fields()});
 			break;
+		case "prepend-ship-ser-id":
+			sendResponse({target:"popup",title:"prepend-ship-ser-id",status:prepend_ship_ser_id()});
+			break;
 		case "get-page-info":
-			//neto_page(function(text) {
-			//	chrome.runtime.sendMessage({target:"popup",title:"page-info",page_details:text},function() {});
-				
-			//});
 			neto_page(function(){},"page-info");
 			break;
 		
@@ -373,6 +372,19 @@ function generate_zone_links() {
 	return "No zone links to convert";
 }
 
+function prepend_ship_ser_id() {
+	var ship_ser_opts = document.querySelectorAll("[name*='lnk_shm'] > option");
+	for (var ssoi = 0; ssoi < ship_ser_opts.length; ssoi++) {
+		var cur_ser_opt = ship_ser_opts[ssoi];
+		var ser_id = cur_ser_opt.value;
+		var ser_name = cur_ser_opt.innerText;
+		if (!ser_name.startsWith(ser_id) && ser_id != "") {
+			cur_ser_opt.innerText = ser_id + " - " + ser_name;
+		}
+	}
+	return "Prepended "+ship_ser_opts.length+" service ID(s)";
+}
+
 function add_sh_cat_to_methods(){
 	click_ad_sh_cat();
 	var num_cat_added=1;
@@ -390,7 +402,10 @@ function add_sh_cat_to_methods(){
 			num_cat_added++;
 		}
 	}
-
+	
+	//making the services readable
+	prepend_ship_ser_id();
+	
 	return num_cat_added+" category(-y+ies) added to methods";
 	
 	function click_ad_sh_cat() {
@@ -583,4 +598,5 @@ chrome.storage.sync.get(null, function(stored_options) {
 	
 	prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
 	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
+	prepend_ship_ser_id()
 });
