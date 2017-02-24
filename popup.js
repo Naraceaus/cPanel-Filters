@@ -73,6 +73,9 @@ document.addEventListener( "DOMContentLoaded", function() {
 	document.getElementById("page-info-refresh").addEventListener("click", function() {
 		get_page_info();
 	});
+	
+	//display version of extension
+	document.getElementById("version-number").innerText = " "+chrome.runtime.getManifest().version;
 });
 
 function process_message(request, sender, sendResponse) {
