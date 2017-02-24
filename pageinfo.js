@@ -80,7 +80,7 @@ function neto_page(finished_func, info_target) {
 				update_info_entry("page-type","Webstore");
 				
 				//check body element for page type
-				var page_body = document.querySelector("body[id*='n_']");
+				var page_body = document.querySelector("body[id*='n_'],body[class*='n_']");
 				if (page_body != null) {
 					update_info_entry("page-subtype",page_body.id.replace("n_",""));
 					update_info_entry("active-theme",page_body.className.replace("n_",""));
