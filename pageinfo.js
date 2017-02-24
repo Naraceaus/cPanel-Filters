@@ -34,7 +34,6 @@ function neto_page(finished_func, info_target) {
 		var res_cont = document.createElement("div");
 		res_cont.innerHTML = webstore_page;
 		theme_ident_el = res_cont.querySelector("[value='TEMPLATELANG']");
-		console.log(theme_ident_el);
 		if (theme_ident_el!=null) {
 			var theme_sel_name = theme_ident_el.name.replace("cfg","cfgval");
 			update_info_entry("default-theme",res_cont.querySelector("[name='"+theme_sel_name+"']").value);
