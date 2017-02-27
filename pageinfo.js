@@ -36,7 +36,16 @@ function neto_page(finished_func, info_target) {
 		theme_ident_el = res_cont.querySelector("[value='TEMPLATELANG']");
 		if (theme_ident_el!=null) {
 			var theme_sel_name = theme_ident_el.name.replace("cfg","cfgval");
-			update_info_entry("default-theme",res_cont.querySelector("[name='"+theme_sel_name+"']").value);
+			var theme_sel = res_cont.querySelector("[name='"+theme_sel_name+"']");
+			update_info_entry("default-theme",theme_sel.value);
+			
+			//generate list of themes in system for active page dropdown
+			var avail_themes = [];
+			var theme_opt = theme_sel.children;
+			for (var toi = 0; toi < theme_opt.length; toi++) {
+				avail_themes.push(theme_opt[toi].value);
+			}
+			update_info_entry("active-theme", avail_themes);
 		} else {
 			update_info_entry("default-theme","n.a.");
 		}

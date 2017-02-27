@@ -84,8 +84,6 @@ document.addEventListener( "DOMContentLoaded", function() {
 
 function process_message(request, sender, sendResponse) {
  //interpret modifications
- console.log(request.title);
-
  switch (request.title) {
 		case "cache-purge":
 		case "ajax-result":
@@ -97,7 +95,9 @@ function process_message(request, sender, sendResponse) {
 		case "page-info-item":
 			update_page_info(request)
 			break;
-
+		case "page-reload":
+			window.location.reload();
+			break;
 			default:
  }
 }
@@ -121,7 +121,6 @@ function print_page_info(info) {
 }
 
 function update_page_info(request) {
-	console.log(request);
 	switch (request.name) {
 		case "act-page-url":
 		case "cpanel-link":
@@ -131,10 +130,11 @@ function update_page_info(request) {
 		case "page-type":
 		case "page-subtype":
 		case "default-theme":
-		case "active-theme":
 			update_info_text(request.name, request.value);
 			break;
-			
+		case "active-theme":
+			update_info_theme_selector(request.name, request.value, request.current);
+			break;
 		case "is-neto":
 		case "logged-in":
 		case "page-info-load-icon":
@@ -149,14 +149,41 @@ function update_page_info(request) {
 		document.getElementById(request.name).className = document.getElementById(request.name).className.replace(/[ ]*fa-spin/,"").replace(/[ ]*fa-spinner/,"");
 		document.getElementById(request.name).className = document.getElementById(request.name).className + " fa-spin fa-spinner";
 	}
-	if (request.hide == true) {
-		document.getElementById(request.name).style.display="none";
-		document.getElementById(request.name+"-label").style.display="none";
-	} else if (request.hide == false) {
-		document.getElementById(request.name).style.display="initial";
-		document.getElementById(request.name+"-label").style.display="initial";
+	if (document.getElementById(request.name) != null && document.getElementById(request.name+"-label") != null){
+		if (request.hide == true) {
+			document.getElementById(request.name).style.display="none";
+			document.getElementById(request.name+"-label").style.display="none";
+		} else if (request.hide == false) {
+			document.getElementById(request.name).style.display="initial";
+			document.getElementById(request.name+"-label").style.display="initial";
+		}
 	}
 }
+
+function update_info_theme_selector(id, theme_array, active_theme) {
+	if (Array.isArray(theme_array)) {		
+		var existing_theme = document.getElementById("active-theme").innerText;
+		var theme_sel = document.createElement("select");
+		
+		for (var toi = 0; toi < theme_array.length; toi++) {
+			var theme_name = theme_array[toi];
+			var theme_opt = document.createElement("option");
+			theme_opt.value = theme_name;
+			theme_opt.innerText = theme_name;
+			if (theme_name == existing_theme) {
+				theme_opt.selected = true;
+				theme_opt.innerText = theme_name + " (current)"
+			}
+			theme_sel.appendChild(theme_opt);
+		}
+		theme_sel.addEventListener("change",reload_new_nview);
+		document.getElementById(id).innerText="";
+		document.getElementById(id).appendChild(theme_sel);
+	} else {
+		update_info_text(id, theme_array);
+	}
+	
+	}
 
 function update_info_link(id, value) {
 	if (value!="" && value!=null) {
@@ -180,6 +207,15 @@ function update_info_bool(id, value) {
 		document.getElementById(id).className = document.getElementById(id).className.replace(/[ ]*fa-[a-zA-z]*/g,"");
 		document.getElementById(id).className = document.getElementById(id).className + " fa-times fa-fw";
 	}
+}
+
+function reload_new_nview() {
+	new_theme = this.value;
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+			console.log("tell "+tabs[0].id+" I want to refresh the page with a new theme");
+			chrome.tabs.sendMessage(tabs[0].id, {title: "reload-new-nview", theme:new_theme}, function(response) {update_results(response.status);});  
+	});
+	
 }
 
 function get_filter_url() {

@@ -43,6 +43,9 @@ function process_message(request, sender, sendResponse) {
 		case "prepend-ship-ser-id":
 			sendResponse({target:"popup",title:"prepend-ship-ser-id",status:prepend_ship_ser_id()});
 			break;
+		case "reload-new-nview":
+			sendResponse({target:"popup",title:"reload-new-nview",status:reload_new_nview(request.theme)});
+			break;
 		case "get-page-info":
 			neto_page(function(){},"page-info");
 			break;
@@ -415,6 +418,22 @@ function add_sh_cat_to_methods(){
 	}
 }
 
+function reload_new_nview(new_theme) {
+	var current_url = window.location.href;
+	var new_url="";
+	if (current_url.includes("?")) {
+		if (current_url.includes("nview")) {
+			new_url = current_url.replace(/nview=[a-zA-Z-_]*/,"nview=" + new_theme);
+		} else {
+			new_url = current_url + "&nview=" + new_theme;
+		}
+	} else {
+		new_url = current_url + "?nview=" + new_theme;
+	}
+	setTimeout(function(){window.location.href = new_url;},1000);
+	return "Refreshing page with " + new_url;
+}
+
 function mark_orderlines_for_shipping() {
 	var lines_to_ship = document.querySelectorAll("[id*=line-_rshq]");
 	var orderlines_shipped = 0;
@@ -600,3 +619,5 @@ chrome.storage.sync.get(null, function(stored_options) {
 	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
 	prepend_ship_ser_id()
 });
+
+chrome.runtime.sendMessage({target:"popup",title:"page-reload",status:"Page Reloaded"}, function() {});
