@@ -502,6 +502,53 @@ function add_all_export_fields() {
 	}
 }
 
+function add_goto_search_element() {
+	var search_bar = document.createElement("input");
+	search_bar.id = "search";
+	search_bar.placeholder= "Enter keyword to search for a page 🔥";
+	search_bar.style.width="100%";
+	search_bar.style.boxSizing="border-box";
+	search_bar.style.borderRadius="2px";
+	search_bar.style.border="1px solid #EFEFEF";
+	search_bar.style.fontSize="22px";
+	search_bar.style.lineHeight="3em";
+	search_bar.style.height="74px";
+	search_bar.style.padding="70px";
+	
+	search_bar.addEventListener("keyup",goto_search);
+	
+	document.body.insertBefore(search_bar, document.body.childNodes[0]);
+}
+
+function goto_search() {
+var search_term=this.value;
+
+var site_rows = document.querySelectorAll("tr[class*='site']");
+// loop over sites
+for (sri = 0; sri < site_rows.length; sri++) {
+	var is_match=false;
+	var cur_site = site_rows[sri];
+
+	if (search_term != "") {
+		var site_children = cur_site.children;
+		//loop over site elements searching for value
+		for (ci = 0; ci < site_children.length; ci++) {
+			var child_elem = site_children[ci];
+			if (child_elem.textContent.toLowerCase().includes(search_term.toLowerCase())) {
+				is_match = true;
+			}
+		}
+	} else {
+		is_match=true;
+	}
+	if (is_match) {
+		cur_site.style.display="table-row";
+	} else {
+		cur_site.style.display="none";
+	}
+}
+}
+
 // Page Load Automations
 chrome.storage.sync.get(null, function(stored_options) {
 	// automatically update filter page url
@@ -619,5 +666,9 @@ chrome.storage.sync.get(null, function(stored_options) {
 	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
 	prepend_ship_ser_id()
 });
+
+if (window.location.hostname=="goto.neto.com.au") {
+	add_goto_search_element();
+}
 
 chrome.runtime.sendMessage({target:"popup",title:"page-reload",status:"Page Reloaded"}, function() {});
