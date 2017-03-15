@@ -27,6 +27,7 @@ function initialise_options() {
 		default_options["auto-repair-cus-conf-url"]=true;
 		default_options["prepend-view-order-method-ids"]=true;
 		default_options["append-id-to-cust-customer-fields"]=true;
+		default_options["prepend-ids-in-ship-matrix"]=true;
 		
 		var def_opt_keys = Object.keys(default_options);
 		

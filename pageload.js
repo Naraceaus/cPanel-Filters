@@ -234,6 +234,7 @@ function prepend_method_ids_to_calc_ship(enabled) {
 	if (itemForms.length == 1 && enabled) {
 		if (itemForms[0].item != null && itemForms[0].page!=null) {
 			if (itemForms[0].item.value=="order" && itemForms[0].page.value=="vieworder") {
+				// prepend select values
 				var meth_options = document.querySelectorAll("[name='_odr_sh_gp'] option");
 
 				for (var opt_i = 0; opt_i < meth_options.length; opt_i++) {
@@ -241,9 +242,59 @@ function prepend_method_ids_to_calc_ship(enabled) {
 					
 					opt.textContent = opt.value + " - " + opt.textContent;
 				}
+				
+				//create go to method button
+				var btn_icon = document.createElement("i");
+				btn_icon.className = "icon-large icon-edit";
+				var goto_link = document.createElement("a");
+				goto_link.appendChild(btn_icon);
+				goto_link.href = "javascript:void(0);";
+				goto_link.title = "Open current method";
+				goto_link.addEventListener('click', function() {
+					window.open('https://'+window.location.hostname+'/_cpanel/shippinggroup/view?id='+document.getElementById("_oder_sh_gp_select").value,'_blank');
+				});
+				document.querySelector("[onclick='recSHP(this);return false;']").parentElement.appendChild(goto_link);
 			}
 		}
 	}
+}
+
+// labelling methods and rates better in the shipping matrix
+function prepend_ids_in_ship_matrix(enabled) {
+	// method prepending
+	var method_containers = document.querySelectorAll(".shm-method-info-pl");
+	for (var mci = 0; mci < method_containers.length; mci++) {
+		cur_met = method_containers[mci];
+		
+		var name_el = cur_met.querySelector(".shm-method-name");
+		var method_id = cur_met.querySelector(".sh-group-id").value;
+		name_el.textContent = method_id + " - " + name_el.textContent;
+		
+	}
+	
+	//rate prepending
+	var rates_containers = document.querySelectorAll(".shm-config-sr");
+	for (var rci = 0; rci < rates_containers.length; rci++) {
+		cur_rate = rates_containers[rci];
+		
+		var name_el = cur_rate.querySelector(".sh-method-name");
+		var rate_id = cur_rate.querySelector(".sh-ref").value;
+		name_el.textContent = rate_id + " - " + name_el.textContent;
+		
+	}
+	
+	//label prepending
+	var label_containers = document.querySelectorAll(".shm-config-cl");
+	for (var rci = 0; rci < label_containers.length; rci++) {
+		cur_label = label_containers[rci];
+		
+		var name_el = cur_label.querySelector(".sh-acc-name");
+		var label_id = cur_label.querySelector(".sh-acc-id").value;
+		name_el.textContent = label_id + " - " + name_el.textContent;
+		
+	}
+	
+	
 }
 
 
@@ -663,6 +714,7 @@ chrome.storage.sync.get(null, function(stored_options) {
 	}
 	
 	prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
+	prepend_ids_in_ship_matrix(stored_options["prepend-ids-in-ship-matrix"])
 	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
 	prepend_ship_ser_id()
 });

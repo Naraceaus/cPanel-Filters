@@ -23,6 +23,7 @@ function save_options() {
   on_page_options["auto-repair-cus-conf-url"] = document.getElementById('auto-repair-cus-conf-url').checked;
   on_page_options["prepend-view-order-method-ids"] = document.getElementById('prepend-view-order-method-ids').checked;
   on_page_options["append-id-to-cust-customer-fields"] = document.getElementById('append-id-to-cust-customer-fields').checked;
+  on_page_options["prepend-ids-in-ship-matrix"] = document.getElementById('prepend-ids-in-ship-matrix').checked;
 		
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
@@ -60,6 +61,7 @@ function load_options() {
 			document.getElementById('auto-repair-cus-conf-url').checked = stored_options["auto-repair-cus-conf-url"];
 			document.getElementById('prepend-view-order-method-ids').checked = stored_options["prepend-view-order-method-ids"];
 			document.getElementById('append-id-to-cust-customer-fields').checked = stored_options["append-id-to-cust-customer-fields"];
+			document.getElementById('prepend-ids-in-ship-matrix').checked = stored_options["prepend-ids-in-ship-matrix"];
 	});
 }
 
