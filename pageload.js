@@ -425,8 +425,9 @@ function prepend_ship_ser_id() {
 	return "Prepended "+ship_ser_opts.length+" service ID(s)";
 }
 
-function add_sh_cat_to_methods(){
-	click_ad_sh_cat();
+function add_sh_cat_to_methods(){	
+	var ad_sh_cat_elem = document.querySelector("[onclick='addShm()']");
+	click_element(ad_sh_cat_elem);
 	var num_cat_added=1;
 	var latestElement = 0;
 
@@ -438,7 +439,7 @@ function add_sh_cat_to_methods(){
 	for (var j=1;j<=numCats-1;j++) {
 		document.getElementsByName("lnk_shid"+parseInt(latestElement+j-1))[0].selectedIndex=j;
 		if (j!=numCats-1) {
-			click_ad_sh_cat();
+			click_element(ad_sh_cat_elem);
 			num_cat_added++;
 		}
 	}
@@ -447,12 +448,12 @@ function add_sh_cat_to_methods(){
 	prepend_ship_ser_id();
 	
 	return num_cat_added+" category(-y+ies) added to methods";
-	
-	function click_ad_sh_cat() {
-		var change_event = document.createEvent("HTMLEvents");
-		change_event.initEvent("click", false, true);
-		document.querySelector("[onclick='addShm()']").dispatchEvent(change_event);
-	}
+}
+
+function click_element(element_to_click) {
+	var change_event = document.createEvent("HTMLEvents");
+	change_event.initEvent("click", true, true);
+	element_to_click.dispatchEvent(change_event);
 }
 
 function reload_new_nview(new_theme) {
