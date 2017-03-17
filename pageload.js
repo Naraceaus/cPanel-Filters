@@ -559,31 +559,218 @@ function add_goto_search_element() {
 }
 
 function goto_search() {
-var search_term=this.value;
+	var search_term=this.value;
 
-var site_rows = document.querySelectorAll("tr[class*='site']");
-// loop over sites
-for (sri = 0; sri < site_rows.length; sri++) {
-	var is_match=false;
-	var cur_site = site_rows[sri];
+	var site_rows = document.querySelectorAll("tr[class*='site']");
+	// loop over sites
+	for (sri = 0; sri < site_rows.length; sri++) {
+		var is_match=false;
+		var cur_site = site_rows[sri];
 
-	if (search_term != "") {
-		var site_children = cur_site.children;
-		//loop over site elements searching for value
-		for (ci = 0; ci < site_children.length; ci++) {
-			var child_elem = site_children[ci];
-			if (child_elem.textContent.toLowerCase().includes(search_term.toLowerCase())) {
-				is_match = true;
+		if (search_term != "") {
+			var site_children = cur_site.children;
+			//loop over site elements searching for value
+			for (ci = 0; ci < site_children.length; ci++) {
+				var child_elem = site_children[ci];
+				if (child_elem.textContent.toLowerCase().includes(search_term.toLowerCase())) {
+					is_match = true;
+				}
+			}
+		} else {
+			is_match=true;
+		}
+		if (is_match) {
+			cur_site.style.display="table-row";
+		} else {
+			cur_site.style.display="none";
+		}
+	}
+}
+
+function add_ebay_proc_search_element() {
+	// search bar to type keyword in
+	var search_bar = document.createElement("input");
+	search_bar.id = "cf-search";
+	search_bar.placeholder= "Enter keyword to search hidden process content 🔥";
+	search_bar.style.boxSizing="border-box";
+	search_bar.style.borderRadius="2px";
+	search_bar.style.border="1px solid #EFEFEF";
+	search_bar.style.width="300px";
+	document.querySelector(".page-title").appendChild(search_bar);
+	
+	var num_pages = 1;
+	var pagination = document.querySelectorAll("[href^='javascript:$.cpGoToPage(']")[document.querySelectorAll("[href^='javascript:$.cpGoToPage(']").length-2];
+	if (pagination != null) {
+		num_pages = parseInt(pagination.textContent);
+	}
+	
+	//label for num pages
+	var num_label = document.createElement("label");
+	num_label.textContent = "Num Pages:";
+	num_label.style.display="inline";
+	
+	// number of pages to search
+	var num_search  = document.createElement("select");
+	num_search.id = "cf-search-num-pages";
+	num_search.style.width="50px";
+	for (var ni=1; ni <=  num_pages; ni++) {
+		var num_elem = document.createElement("option");
+		num_elem.textContent = ni;
+		num_elem.value=ni;
+		num_search.appendChild(num_elem);
+	}
+	
+	num_label.appendChild(num_search);
+	document.querySelector(".page-title").appendChild(num_label);
+	
+	//submit search button
+	var search_go = document.createElement("button");
+	search_go.id = "cf-search-btn";
+	search_go.setAttribute("data-state","ready");
+	search_go.textContent = "Run Keyword Search";
+	search_go.addEventListener("click",ebay_proc_search);
+	document.querySelector(".page-title").appendChild(search_go);
+
+}
+
+function ebay_proc_search() {
+	var search_btn = document.getElementById("cf-search-btn")
+	var search_elem = document.getElementById("cf-search");
+	var num_pages_elem = document.getElementById("cf-search-num-pages");
+
+	if (search_btn.getAttribute('data-state') == "ready") {
+		search_btn.setAttribute("data-state","running");
+		search_btn.setAttribute("data-cur-page","1");
+		search_btn.textContent = "Stop Search";
+		search_elem.setAttribute('disabled',true);
+		num_pages_elem.setAttribute('disabled',true);
+		
+
+		
+		
+		var proc_filt = generate_filter_qs();
+		proc_filt.add_key("_sb_pgnum","1");
+		proc_filt.add_key("proc","");
+		proc_filt.add_key("tkn","ebproclog");
+		proc_filt.add_key("fn","");
+		proc_filt.add_key("ajax","y");
+		
+		//loop through pager counter ajaxing the results and opening tabs that match
+		make_ajax_request("/_cpanel",proc_filt.toString(),process_ebay_proc_search);
+		
+	} else if (search_btn.getAttribute('data-state') == "running") {
+		search_btn.setAttribute("data-state","ready");
+		search_btn.setAttribute("data-cur-page","1");
+		search_btn.textContent = "Run Keyword Search";
+		
+		search_elem.removeAttribute('disabled');
+		
+		num_pages_elem.removeAttribute('disabled');
+	}
+}
+
+function process_ebay_proc_search(request) {
+
+	var search_btn = document.getElementById("cf-search-btn")
+	var search_elem = document.getElementById("cf-search");
+	var num_pages_elem = document.getElementById("cf-search-num-pages");
+	
+	var search_term = search_elem.value;
+	var cur_page = parseInt(search_btn.getAttribute("data-cur-page"));
+	var table_text = unescape(request.responseText.replace(/NSD1;#4\|\$[0-9]*\|[a-zA-Z]*\$[0-9]*\|/,"").replace(/\$[0-9]*\|.*/,""));
+	
+	if (search_btn.getAttribute("data-state")=="running") {
+		var table_cont = document.createElement("div");
+		table_cont.innerHTML = table_text;
+		
+		var mags_found = [];
+		var pot_rows=table_cont.querySelectorAll(".row0");
+		for (var pri = 0; pri < pot_rows.length; pri++) {
+			var row = pot_rows[pri];
+			if (row.textContent.indexOf(search_term)>0) {
+				mags_found.push(row.querySelector("[data-toggle='collapse']").getAttribute("href").replace("#collapse",""));
+			}
+			
+		}
+		if (mags_found.length > 0) {
+			var new_page_qry = generate_filter_qs();
+			new_page_qry.add_key("_sb_pgnum",cur_page);
+			new_page_qry.add_key("cf_mags",mags_found.toString());
+			chrome.runtime.sendMessage({target:"background",title:"open-tab",url:'https://'+window.location.hostname+'/_cpanel/ebproclog?'+new_page_qry.toString()}, function() {});
+		}
+		
+		if (cur_page < num_pages_elem.value) {
+			cur_page++;
+			search_btn.setAttribute("data-cur-page", cur_page)
+			var proc_filt = generate_filter_qs();
+			proc_filt.add_key("proc","");
+			proc_filt.add_key("tkn","ebproclog");
+			proc_filt.add_key("fn","");
+			proc_filt.add_key("ajax","y");
+			proc_filt.add_key("_sb_pgnum",cur_page);
+			
+			//loop through pager counter ajaxing the results and opening tabs that match
+			make_ajax_request("/_cpanel",proc_filt.toString(),process_ebay_proc_search);
+		} else {
+			search_btn.setAttribute("data-state","ready");
+			search_btn.setAttribute("data-cur-page","1");
+			search_btn.textContent = "Run Keyword Search";
+			search_elem.removeAttribute('disabled');
+			num_pages_elem.removeAttribute('disabled');
+		}
+	}
+}
+
+function queryString(start_string) {
+	
+	this.contents = {};	
+	
+	this.add_key = function(key, value){
+		this.contents[key] = value;
+	}
+	this.remove_key = function(key){
+		delete this.contents[key];
+	}
+	this.add_from_string = function(qs) {
+		qs = qs.replace("?","");
+		if (qs.length > 0) {
+			var qs_arr = qs.split("&");
+			for (var qsi = 0; qsi < qs_arr.length; qsi++) {
+				var qs_pair_str = qs_arr[qsi];
+				qs_par_arr = qs_pair_str.split("=");
+				this.add_key(qs_par_arr[0], qs_par_arr[1]);
 			}
 		}
-	} else {
-		is_match=true;
 	}
-	if (is_match) {
-		cur_site.style.display="table-row";
-	} else {
-		cur_site.style.display="none";
+	
+		
+	if (typeof(start_string) == "string") {
+		this.add_from_string(start_string);
 	}
+	
+	this.get_key = function(key){
+		return this.contents[key];
+	}
+	
+	this.toString = function(){
+		var result = "";
+		var keys = Object.keys(this.contents);
+		for (var ki = 0; ki < keys.length; ki++) {
+			var key = keys[ki];
+			var value = this.contents[key];
+			result+=key
+			if (value!=undefined) {
+				result+="="+value;
+			}
+			if (ki != keys.length-1) {
+				result+="&";
+			}
+		}
+		return result;
+	}
+	
+	
+	return this;
 }
 
 function generate_filter_qs() {
@@ -713,11 +900,28 @@ chrome.storage.sync.get(null, function(stored_options) {
 	prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
 	prepend_ids_in_ship_matrix(stored_options["prepend-ids-in-ship-matrix"])
 	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
-	prepend_ship_ser_id()
+	prepend_ship_ser_id();
+	
+	// query string based automations
+	var current_qs = new queryString(window.location.search);
+
+	//auto-open magnifying glasses
+	var mags = current_qs.get_key('cf_mags');
+	if (mags != undefined && mags!="") {
+		var mags_array = mags.split(",");
+		for (mai = 0; mai < mags_array.length; mai++) {
+			var mag_num = mags_array[mai];
+			click_element(document.querySelector("[href='#collapse"+mag_num+"']"));
+		}
+	}
+	
 });
 
 if (window.location.hostname=="goto.neto.com.au") {
 	add_goto_search_element();
+}
+if (window.location.pathname=="/_cpanel/ebproclog") {
+	add_ebay_proc_search_element();
 }
 
 chrome.runtime.sendMessage({target:"popup",title:"page-reload",status:"Page Reloaded"}, function() {});
