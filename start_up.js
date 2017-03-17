@@ -43,3 +43,25 @@ function initialise_options() {
 		chrome.storage.sync.set(default_options, function() {});
 	});
 }
+
+
+//setup listener in so the backround page can do things with chrome.tabs that content scripts can't do
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.target=="background") {
+		process_message(request, sender, sendResponse);
+	}
+});
+
+function process_message(request, sender, sendResponse) {
+ //interpret modifications
+ switch (request.title) {
+		case "open-tab":
+   open_tab(request.url);
+			break;
+		default:
+ }
+}
+
+function open_tab(url) {
+	chrome.tabs.create({url:url,selected:false}, function (tabs) {});
+}
