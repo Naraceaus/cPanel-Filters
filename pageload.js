@@ -561,7 +561,7 @@ function add_goto_search_element() {
 function goto_search() {
 	var search_term=this.value;
 
-	var site_rows = document.querySelectorAll("tr[class*='site']");
+	var site_rows = document.querySelectorAll("tbody tr");
 	// loop over sites
 	for (sri = 0; sri < site_rows.length; sri++) {
 		var is_match=false;
