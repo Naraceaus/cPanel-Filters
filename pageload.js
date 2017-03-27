@@ -237,9 +237,9 @@ function prepend_method_ids_to_calc_ship(enabled) {
 				goto_link.href = "javascript:void(0);";
 				goto_link.title = "Open current method";
 				goto_link.addEventListener('click', function() {
-					window.open('https://'+window.location.hostname+'/_cpanel/shippinggroup/view?id='+document.getElementById("_oder_sh_gp_select").value,'_blank');
+					window.open('https://'+window.location.hostname+'/_cpanel/shippinggroup/view?id='+document.querySelector("[name='_odr_sh_gp']").value,'_blank');
 				});
-				document.querySelector("[onclick='recSHP(this);return false;']").parentElement.appendChild(goto_link);
+				document.querySelector("[name='_odr_sh_gp']").parentElement.appendChild(goto_link);
 			}
 		}
 	}
