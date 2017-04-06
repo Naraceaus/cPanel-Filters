@@ -902,6 +902,10 @@ chrome.storage.sync.get(null, function(stored_options) {
 	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
 	prepend_ship_ser_id();
 	
+	if (document.querySelector("[onclick='addShm()']") != null) {
+		document.querySelector("[onclick='addShm()']").addEventListener("click",function(){prepend_ship_ser_id()});
+	}
+	
 	// query string based automations
 	var current_qs = new queryString(window.location.search);
 
