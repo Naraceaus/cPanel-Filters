@@ -55,6 +55,9 @@ document.addEventListener( "DOMContentLoaded", function() {
 	document.getElementById("add-all-export-fields").addEventListener("click", function () {
 		add_all_export_fields();
 	});
+	document.getElementById("get-import-find-replace").addEventListener("click", function () {
+		get_import_find_replace();
+	});
 	
 	document.getElementById('options-link').addEventListener("click", function() {
   if (chrome.runtime.openOptionsPage) {
@@ -327,6 +330,14 @@ function add_all_export_fields() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
 		console.log("tell "+tabs[0].id+" to add all the export fields to the export wizard");
 		chrome.tabs.sendMessage(tabs[0].id, {title: "add-all-export-fields"}, function(response) {update_results(response.status)});  
+	});
+}
+
+function get_import_find_replace() {
+	update_results("Retrieving Import Find and Replace");
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+		console.log("tell "+tabs[0].id+" to add get the find and replace fields of an import template");
+		chrome.tabs.sendMessage(tabs[0].id, {title: "get-import-find-replace"}, function(response) {update_results(response.status)});  
 	});
 }
 

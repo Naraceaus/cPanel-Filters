@@ -40,6 +40,9 @@ function process_message(request, sender, sendResponse) {
 		case "add-all-export-fields":
 			sendResponse({target:"popup",title:"add-all-export-fields",status:add_all_export_fields()});
 			break;
+		case "get-import-find-replace":
+			sendResponse({target:"popup",title:"get-import-find-replace",status:get_import_find_replace()});
+			break;
 		case "prepend-ship-ser-id":
 			sendResponse({target:"popup",title:"prepend-ship-ser-id",status:prepend_ship_ser_id()});
 			break;
@@ -537,6 +540,62 @@ function add_all_export_fields() {
 		return "Added "+num_fields_added+" export fields to export wizard";
 	} else {
 		return "Error: Page not viable for adding export fields";
+	}
+}
+
+function get_import_find_replace() {
+	var repText = '"Find","Replace","Exact Match","Reg Exp","Replace All","Case Sensitive","Multi Line","Column","Priority"\n';
+	var findElements = document.querySelectorAll("[name*='rep_find']");
+
+	for (var fei = 0; fei < findElements.length; fei++) {
+		//add find
+		repText = addCSVCellFromElement(repText, "[name='rep_find"+fei+"']");
+		
+		//add replace
+		repText = addCSVCellFromElement(repText, "[name='rep_rep"+fei+"']");
+		
+		//add exact match
+		repText = addCSVCellFromElement(repText, "[name='rep_exm"+fei+"']");
+			
+		//add regular exp
+		repText = addCSVCellFromElement(repText, "[name='rep_reg"+fei+"']");
+			
+		//add replace all
+		repText = addCSVCellFromElement(repText, "[name='rep_all"+fei+"']");
+			
+		//add case sensitive
+		repText = addCSVCellFromElement(repText, "[name='rep_cas"+fei+"']");
+			
+		//add multi line
+		repText = addCSVCellFromElement(repText, "[name='rep_mul"+fei+"']");
+			
+		//add column
+		repText = addCSVCellFromElement(repText, "[name='rep_col"+fei+"']");
+
+		//add priority
+		repText = addCSVCellFromElement(repText, "[name='rep_pri"+fei+"']");
+
+		repText = addCSVRow(repText);
+	}
+
+	return repText;
+
+	function addCSVCellFromElement(csvText, selector) {
+		var elem = document.querySelector(selector);
+		var delimeter = "";
+		if (csvText.slice(-1) == '"') {
+			delimeter = ",";
+		}
+		
+		if (elem != undefined) {
+			return csvText+delimeter+'"'+elem.value.replace(/"/g,'""')+'"';
+		} else {
+			return csvText+delimeter+',""';
+		}
+	}
+
+	function addCSVRow(csvText) {
+		return csvText+'\n';
 	}
 }
 
