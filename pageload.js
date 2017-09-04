@@ -286,7 +286,14 @@ function prepend_ids_in_ship_matrix(enabled) {
 	
 }
 
-
+function prepend_ids_in_label_config(enabled){
+	document.querySelectorAll("[name*='sev_s']").forEach(function(service, index){
+		if (/sev_s[0-9]*_m[0-9]/.test(service.name)) {
+			serviceLabel = document.querySelector("label[for='"+service.name+"']");
+			serviceLabel.innerText = service.value+" - "+serviceLabel.innerText;
+		}
+	});
+}
 
 // one customer cards add the id in brackets to the end of custom fields
 function append_id_to_cust_customer_fields(enabled) {
@@ -339,6 +346,15 @@ function make_ajax_request(path,qry_str,success_func,fail_func,is_get) {
 	
 	ajax_request.onreadystatechange=function() {
 					if (ajax_request.readyState == XMLHttpRequest.DONE ) {
+						
+								if (ajax_request.response != null) {
+									// remove script tags
+									ajax_request.processed_response = ajax_request.response.replace(/[\r\n]*<script[\s\S]*?<\/script>[\r\n]*/g,"")
+									//remove style tags
+									ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<style[\s\S]*?<\/style>[\r\n]*/g,"");
+									//remove image tags
+									ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<img[\s\S]*?>[\r\n]*/g,"");
+								}
 								if (ajax_request.status == 200) {
 									if (typeof(success_func) == "function") {
 										success_func(ajax_request);
@@ -614,7 +630,7 @@ function add_goto_search_element() {
 	
 	search_bar.addEventListener("keyup",goto_search);
 	
-	document.body.insertBefore(search_bar, document.body.childNodes[0]);
+	document.body.insertBefore(search_bar, document.body.children[0]);
 }
 
 function goto_search() {
@@ -958,6 +974,7 @@ chrome.storage.sync.get(null, function(stored_options) {
 	
 	prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
 	prepend_ids_in_ship_matrix(stored_options["prepend-ids-in-ship-matrix"])
+	prepend_ids_in_label_config(stored_options["prepend-ids-in-label-config"])
 	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
 	prepend_ship_ser_id();
 	
@@ -980,11 +997,208 @@ chrome.storage.sync.get(null, function(stored_options) {
 	
 });
 
-if (window.location.hostname=="goto.neto.com.au") {
+if (window.location.hostname=="goto.production.neto.net.au" || window.location.hostname=="goto.neto.com.au") {
 	add_goto_search_element();
 }
 if (window.location.pathname=="/_cpanel/ebproclog") {
 	add_ebay_proc_search_element();
+}
+
+function check_eBay_process(ajax_response, reset = false) {
+
+	var total_running_ebay_proc_ids = [];
+	var stuck_ebay_proc_ids = [];
+	
+	var eBay_running_process_list = document.createElement("div");
+	eBay_running_process_list.innerHTML = ajax_response.processed_response;
+	
+	var running_check_boxes = eBay_running_process_list.querySelectorAll("[name^='itm']");
+	for (var itm_i = 0; itm_i < running_check_boxes.length; itm_i++) {
+		var cur_itm = running_check_boxes[itm_i];
+		if (cur_itm.name != "itm_total") {
+			var cur_proc_id = cur_itm.value;
+			var proc_start_time_text = cur_itm.parentElement.parentElement.children[9].innerText;
+			var proc_start_date = new Date(proc_start_time_text.replace(/[()]/g,""))
+			var now_date = new Date();
+			// if running for more than hour mark as stalled
+			if (now_date - proc_start_date > 1000*60*60) {
+				stuck_ebay_proc_ids.push(cur_proc_id);
+			}
+			total_running_ebay_proc_ids.push(cur_proc_id);
+		}
+	}
+	if (stuck_ebay_proc_ids.length > 0) {
+		console.log("following eBay processes are probably stuck: ");
+		console.log(stuck_ebay_proc_ids);		
+		create_stuck_ebay_popup();
+	}
+	
+	if (reset){
+
+		if (document.querySelector("#reset_ebay_batch_btn") != null) {
+			document.querySelector("#reset_ebay_batch_btn").disabled="true";
+		}
+
+
+		if (total_running_ebay_proc_ids.length > 0) {
+			if (document.querySelector("#stuck_ebay_output") != null) {
+				document.querySelector("#stuck_ebay_output").innerText = "Stopping eBay processes: "+total_running_ebay_proc_ids;
+			}
+			
+			// stop eBay processes
+				var procs_stopped=0;
+				for (var proc_i = 0; proc_i < total_running_ebay_proc_ids.length; proc_i++) {
+					var cur_proc_id = total_running_ebay_proc_ids[proc_i];
+					make_ajax_request("/_cpanel/ebprocmgr","proc=stop&itm0="+cur_proc_id+"&itm_total=1",function() {
+						
+						procs_stopped++;
+						if (procs_stopped >= total_running_ebay_proc_ids.length) {
+							if (document.querySelector("#stuck_ebay_output") != null) {
+								document.querySelector("#stuck_ebay_output").innerText = "Searching for running eBay batch process";
+							}
+							
+							// find running ebay_batch process to stop it
+							make_ajax_request("/_cpanel/procmgr?_ftr_module=ebay_batch&_ftr_status=Running&_sb_limit=1","",reset_ebay_batch,null,true);
+						}
+					});
+				}
+		} else {
+			if (document.querySelector("#stuck_ebay_output") != null) {
+				document.querySelector("#stuck_ebay_output").innerText = "No running eBay Processes. Checking ebay_batch";
+			}
+			
+			// find running ebay_batch process to stop it
+			make_ajax_request("/_cpanel/procmgr?_ftr_module=ebay_batch&_ftr_status=Running&_sb_limit=1","",reset_ebay_batch,null,true);
+		}
+
+	}
+}
+
+function create_stuck_ebay_popup(){
+	var existing_popups = document.querySelectorAll("[id='stuck_ebay_proc_notify']");
+	for (var pop_i = 0; pop_i < existing_popups.length; pop_i++) {
+		var pop_elem = e_pop = existing_popups[pop_i];
+		e_pop.parentElement.removeChild(e_pop);
+	}
+	var new_popup = document.createElement("div");
+	new_popup.id = "stuck_ebay_proc_notify";
+	new_popup.style.position="absolute";
+	new_popup.style.right="0px";
+	new_popup.style.top="25%";
+	new_popup.style.width="300px";
+	new_popup.style.background="#083E52";
+	new_popup.style.color="white";
+	new_popup.style.padding="15px";
+	
+	
+	var message_text = document.createElement("span");
+	message_text.id = "stuck_ebay_message";
+	message_text.innerHTML = "It looks like this site has a stuck eBay process. You should take a look at <a href='https://www.neto.com.au/docs/ebay/troubleshooting-ebay/troubleshooting-orders-and-revisions/'>here</a>. Or just click the button below.";
+	message_text.style.width="100%";
+	message_text.style.float="left";
+	message_text.style.marginBottom="10px";
+	
+	var reset_button = document.createElement("button");
+	reset_button.id = "reset_ebay_batch_btn";
+	reset_button.innerText = "Reset eBay Batch Process";
+	reset_button.style.width="100%";
+	reset_button.style.float="left";
+	reset_button.style.marginBottom="10px";
+	reset_button.style.padding="6px";
+	
+	reset_button.addEventListener("click", function() {
+			make_ajax_request("/_cpanel/ebprocmgr?_ftr_status=Running","", function(ajax_response) {check_eBay_process(ajax_response, true)},null,true);
+	})
+	
+	var output_text = document.createElement("span");
+	output_text.id = "stuck_ebay_output";
+	output_text.innerText = "Ready";
+	output_text.style.width="100%";
+	output_text.style.float="left";
+	output_text.style.align="center";
+	
+	new_popup.appendChild(message_text);
+	new_popup.appendChild(reset_button);
+	new_popup.appendChild(output_text);
+	document.documentElement.appendChild(new_popup);
+	
+}
+
+function reset_ebay_batch(ajax_response) {
+	var ebay_batch_list = document.createElement("div");
+	ebay_batch_list.innerHTML = ajax_response.processed_response;
+	
+	var running_check_boxes = ebay_batch_list.querySelectorAll("[name^='itm']");
+	
+	var found_running_ebay_batch = false;
+	
+	for (var itm_i = 0; itm_i < running_check_boxes.length; itm_i++) {
+		var cur_itm = running_check_boxes[itm_i];
+			if (cur_itm.name != "itm_total") {
+			var cur_proc_id = cur_itm.value;
+			found_running_ebay_batch = true;
+			if (document.querySelector("#stuck_ebay_output") != null) {
+				document.querySelector("#stuck_ebay_output").innerText = "Stopping ebay_batch processes: "+cur_proc_id;
+			}
+			make_ajax_request("/_cpanel/ebprocmgr?proc=stop&itm0="+cur_proc_id+"&itm_total=1","",start_new_ebay_batch,null,true);
+			break;
+		}
+	}
+	if (!found_running_ebay_batch) {
+		if (document.querySelector("#stuck_ebay_output") != null) {
+			document.querySelector("#stuck_ebay_output").innerText = "No running ebay_batch. Starting new ebay_batch: "+cur_proc_id;
+		}
+		make_ajax_request("/_cpanel/ebprocmgr?proc=stop&itm0="+cur_proc_id+"&itm_total=1","",start_new_ebay_batch,null,true);		
+	}
+	
+}
+
+function start_new_ebay_batch() {
+	if (document.querySelector("#stuck_ebay_output") != null) {
+		document.querySelector("#stuck_ebay_output").innerText = "Looking for pending ebay_batch process";
+	}
+	make_ajax_request("/_cpanel/procmgr?_ftr_module=ebay_batch&_ftr_status=Pending&_sb_limit=1","",function(ajax_response) {
+		var ebay_batch_list = document.createElement("div");
+		ebay_batch_list.innerHTML = ajax_response.processed_response;
+		
+		var found_pending = false;
+		
+		var pending_check_boxes = ebay_batch_list.querySelectorAll("[name^='itm']");
+		for (var itm_i = 0; itm_i < pending_check_boxes.length; itm_i++) {
+			var cur_itm = pending_check_boxes[itm_i];
+				if (cur_itm.name != "itm_total") {
+				found_pending=true;
+				var cur_proc_id = cur_itm.value;
+				if (document.querySelector("#stuck_ebay_output") != null) {
+					document.querySelector("#stuck_ebay_output").innerText = "Starting ebay_batch processes: "+cur_proc_id;
+				}
+				make_ajax_request("/_cpanel/procmgr?proc=run&id="+cur_proc_id+"&_ftr_pid="+cur_proc_id,"",function(ajax_response) {
+					if (document.querySelector("#stuck_ebay_output") != null) {
+						document.querySelector("#stuck_ebay_output").innerText = "eBay process reset complete";
+					}
+				},null,true);
+				break;
+			}
+		}
+		
+		if (!found_pending) {
+			if (document.querySelector("#stuck_ebay_output") != null) {
+				document.querySelector("#stuck_ebay_output").innerText = "No pending ebay_batch. Adding new process to queue";
+			}
+			make_ajax_request("/_cpanel/batchproc?proc=ebay","",start_new_ebay_batch,null,true);
+		}
+		
+	},null,true);
+
+}
+
+//TODO remove below thats there for manual testing
+//create_stuck_ebay_popup();
+
+// check eBay backlog
+if (window.location.pathname.includes("_cpanel")) {
+//	make_ajax_request("/_cpanel/ebprocmgr?_ftr_status=Running","",check_eBay_process,null,true);
+
 }
 
 chrome.runtime.sendMessage({target:"popup",title:"page-reload",status:"Page Reloaded"}, function() {});
