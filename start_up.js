@@ -43,7 +43,7 @@ function process_message(request, sender, sendResponse) {
 			open_tab(request.url);
 			break;
 		case "auto-open-cpanel":
-			autoOpenCPanel(request.domain);
+			autoOpenCPanel(request.domain, sender.tab);
 		default:
  }
 }
@@ -52,10 +52,16 @@ function open_tab(url) {
 	chrome.tabs.create({url:url,selected:false}, function (tabs) {});
 }
 
-function autoOpenCPanel(domain) {
+function autoOpenCPanel(domain, sender_tab) {
+	console.log(sender_tab);
+	var new_tab_options = {url:"https://"+domain+"/_cpanel",selected:false};
+	if (sender_tab != null) {
+		new_tab_options.index = sender_tab.index+1;
+		new_tab_options.windowId = sender_tab.windowId;
+	}
 	chrome.tabs.query({url:["*://"+domain+"/_cpanel/*", "*://"+domain+"/cgi-bin/suppliers/index.cgi/*"]}, function (tabs_found) {
 		if (tabs_found.length == 0) {
-			chrome.tabs.create({url:"https://"+domain+"/_cpanel",selected:false}, function (tabs) {});
+			chrome.tabs.create(new_tab_options, function (tabs) {});
 		}
 	});
 }
