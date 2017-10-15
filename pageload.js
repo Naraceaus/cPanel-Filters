@@ -176,6 +176,9 @@ function prepend_ids_in_ship_matrix(enabled) {
 		cur_met = method_containers[mci];
 		
 		var name_el = cur_met.querySelector(".shm-method-name");
+		while (name_el.children.length > 0) {
+			name_el = name_el.children[0];
+		}
 		var method_id = cur_met.querySelector(".sh-group-id").value;
 		name_el.textContent = method_id + " - " + name_el.textContent;
 		
@@ -187,6 +190,9 @@ function prepend_ids_in_ship_matrix(enabled) {
 		cur_rate = rates_containers[rci];
 		
 		var name_el = cur_rate.querySelector(".sh-method-name");
+		while (name_el.children.length > 0) {
+			name_el = name_el.children[0];
+		}
 		var rate_id = cur_rate.querySelector(".sh-ref").value;
 		name_el.textContent = rate_id + " - " + name_el.textContent;
 		
@@ -198,6 +204,9 @@ function prepend_ids_in_ship_matrix(enabled) {
 		cur_label = label_containers[rci];
 		
 		var name_el = cur_label.querySelector(".sh-acc-name");
+		while (name_el.children.length > 0) {
+			name_el = name_el.children[0];
+		}
 		var label_id = cur_label.querySelector(".sh-acc-id").value;
 		name_el.textContent = label_id + " - " + name_el.textContent;
 		
