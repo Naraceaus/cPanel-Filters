@@ -4,55 +4,23 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 function process_message(request, sender, sendResponse) {
+	console.log("processing message")
+	console.log(request)
 	//interpret modifications
 	switch (request.title) {
-		case "get-filter-url":
-   sendResponse({target:"popup",title:"filter-url",filter_url:generate_filter_url()});
-			break;
 		case "find-page-in-cpanel":
-   sendResponse({target:"popup",title:"found-cpanel-url",cpanel_url:find_url_in_cpanel()});
-			break;
-		case "highlight-adverts":
-			remove_ad_highlight();
-			sendResponse({target:"popup",title:"placed-ad-highlights",num_ads_found:place_ad_highlight()});
-			break;
-		case "de-highlight-adverts":
-			sendResponse({target:"popup",title:"removed-ad-highlights",num_ads_removed:remove_ad_highlight()});
-			break;
-		case "purge-server-cache":
-			sendResponse({target:"popup",title:"purge-server-cache",status:purge_server_cache()});
-			break;
-		case "heavily-purge-server-cache":
-			sendResponse({target:"popup",title:"heavily-purge-server-cache",status:heavily_purge_server_cache()});
-			break;
-		case "display-parent-fields":
-			sendResponse({target:"popup",title:"display-parent-fields",status:display_parent_fields()});
-			break;
-		case "generate-zone-links":
-			sendResponse({target:"popup",title:"generate-zone-links",status:generate_zone_links()});
-			break;
-		case "mark-orderlines-for-shipping":
-			sendResponse({target:"popup",title:"mark-orderlines-for-shipping",status:mark_orderlines_for_shipping()});
-			break;
-		case "add-sh-cat-to-methods":
-			sendResponse({target:"popup",title:"add-sh-cat-to-methods",status:add_sh_cat_to_methods()});
-			break;
-		case "add-all-export-fields":
-			sendResponse({target:"popup",title:"add-all-export-fields",status:add_all_export_fields()});
-			break;
-		case "get-import-find-replace":
-			sendResponse({target:"popup",title:"get-import-find-replace",status:get_import_find_replace()});
-			break;
-		case "prepend-ship-ser-id":
-			sendResponse({target:"popup",title:"prepend-ship-ser-id",status:prepend_ship_ser_id()});
+			sendResponse({target:"popup",title:"found-cpanel-url",cpanel_url:find_url_in_cpanel()});
 			break;
 		case "reload-new-nview":
 			sendResponse({target:"popup",title:"reload-new-nview",status:reload_new_nview(request.theme)});
 			break;
-		case "get-page-info":
-			neto_page(function(){},"page-info");
+//		case "get-page-info":
+//			neto_page(function(){},"page-info");
+//			break;
+		case "generate-dialog":
+			console.log("generate dialog requested")
+			createSidePanel();
 			break;
-		
 		default:
 	}
 }
@@ -118,54 +86,6 @@ function find_url_in_cpanel() {
 	
 	return host+cpanel_filter+path;
 	
-}
-
-function remove_ad_highlight() {
-	var num_ads_found = 0;
-	var imgs_highlighted = document.querySelectorAll(".ad-high-cont img[src*='/assets/marketing");
-	for (var ex_i = 0; ex_i < imgs_highlighted.length; ex_i++) {
-		var high_img = imgs_highlighted[ex_i];
-		var assumed_high_cont = high_img.parentElement;
-		var assumed_cont_par = assumed_high_cont.parentElement;
-		
-		assumed_cont_par.appendChild(high_img);
-		assumed_cont_par.removeChild(assumed_high_cont);
-		num_ads_found++;
-	}
-	
-	return num_ads_found;
-}
-
-function place_ad_highlight() {
-	var num_ads_found = 0;
-	var ad_imgs = document.querySelectorAll("img[src*='/assets/marketing']");
-	for (var ad_i=0; ad_i < ad_imgs.length; ad_i++) {
-		var advert = ad_imgs[ad_i];
-		var advert_parent = advert.parentElement;
-		var new_cont = document.createElement("div");
-		new_cont.className="ad-high-cont";
-		new_cont.style.position="relative";
-		
-		var high_link = document.createElement("a");
-		high_link.className="ad-highlight";
-		high_link.href=advert.src.replace("/assets/marketing/","/_cpanel/adw/view?id=").replace(".jpg","").replace(".png","");
-		high_link.style.position = "absolute";
-		high_link.style.left = "50%";
-		high_link.style.marginRight = "-50%";
-		var high_btn = document.createElement("button");
-		high_btn.type = "button";
-		high_btn.textContent = "Open in cPanel";
-		high_btn.style.position="absolute";
-		high_btn.style.top="0px";
-		high_btn.style.right="0px";
-		high_link.appendChild(high_btn);
-		
-		new_cont.appendChild(advert);
-		new_cont.appendChild(high_link);
-		advert_parent.appendChild(new_cont);
-		num_ads_found++;
-	}
-	return num_ads_found;
 }
 
 function gen_repair_url(base_path, required_inputs, optional_inputs) {
@@ -318,67 +238,98 @@ function append_id_to_cust_customer_fields(enabled) {
 	}
 }
 
-//purge cache and refresh page
-function purge_server_cache() {
-	make_ajax_request("/_cpanel","ajaxfn=system_refresh&ajax=y",purge_server_sucessful);
-	return "Purging Cache, page will refresh once cache is purged";
-}
-
-function purge_server_sucessful(ajax_response){
-	if (ajax_response.responseText == "NSD1;#1|$2|ok$1|1") {
-				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Cache Purged"}, function() {});
-				location.reload();
-	} else if (ajax_response.responseText == "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
-				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Error: You are not logged into the cPanel. Please login before attempting to purge the cache"}, function() {});
+function start_server_purge() {
+	document.querySelector("#purge_btn").disabled = true;
+	
+	var heavy = document.querySelector("#heavy_purge").checked;
+	var refresh = document.querySelector("#refresh_purge").checked;
+	
+	
+	if (heavy) {
+		heavily_purge_server_cache(refresh);
 	} else {
-				chrome.runtime.sendMessage({target:"popup",title:"cache-purge",status:"Unkown Error Occured. Send this to administrator: "+ajax_response.responseText}, function() {});
+		purge_server_cache(null, refresh);
 	}
 }
 
 //heavily purge cache including querystring appended to js and css files allowing those fields to be purged on all machines
-function heavily_purge_server_cache() {
-	make_ajax_request("/_cpanel","tkn=webshop&proc=edit&ajax=y",purge_server_cache);
-	return "Heavily Purging Cache, page will refresh once cache is purged";
+function heavily_purge_server_cache(refresh) {
+	make_ajax_request("/_cpanel","tkn=webshop&proc=edit&ajax=y",purge_server_cache, null, false, [refresh]);
+	document.querySelector("#purge_btn").innerText = "Updating CSS Config";
+}
+//purge cache and refresh page
+function purge_server_cache(ajax_response, refresh) {
+
+	make_ajax_request("/_cpanel","ajaxfn=system_refresh&ajax=y",purge_server_sucessful, null, false, [refresh]);
+	
+	var update_text = "Purging Server Cache";
+	if (refresh) {
+		update_text+=", page will refresh once cache is purged";
+	}
+	
+	document.querySelector("#purge_btn").innerText = update_text;
 }
 
-function make_ajax_request(path,qry_str,success_func,fail_func,is_get) {
+function purge_server_sucessful(ajax_response, refresh){
+	document.querySelector("#purge_btn").disabled = false;
+	if (ajax_response.responseText == "NSD1;#1|$2|ok$1|1") {
+		
+		if (refresh) {
+			document.querySelector("#purge_btn").innerText = "Cache Purged, Refreshing Page";
+			location.reload();
+		} else {
+			document.querySelector("#purge_btn").innerText = "Cache Purge Complete";
+		}
+	} else if (ajax_response.responseText == "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
+		document.querySelector("#purge_btn").innerText = "Purge Failed. Login To cPanel First";
+	} else {
+		document.querySelector("#purge_btn").innerText = "Unkown Error Occured. Please Contact Administrator";
+	}
+}
+
+
+function make_ajax_request(path,qry_str,success_func,fail_func,is_get,input) {
+	if (input == null || !(input instanceof Array)) {
+		input = [];
+	}
 	var ajax_request = new XMLHttpRequest();
 	
 	ajax_request.onreadystatechange=function() {
-					if (ajax_request.readyState == XMLHttpRequest.DONE ) {
-						
-								if (ajax_request.response != null) {
-									// remove script tags
-									ajax_request.processed_response = ajax_request.response.replace(/[\r\n]*<script[\s\S]*?<\/script>[\r\n]*/g,"")
-									//remove style tags
-									ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<style[\s\S]*?<\/style>[\r\n]*/g,"");
-									//remove image tags
-									ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<img[\s\S]*?>[\r\n]*/g,"");
-								}
-								if (ajax_request.status == 200) {
-									if (typeof(success_func) == "function") {
-										success_func(ajax_request);
-									}
-								}
-								else if (ajax_request.status == 400) {
-											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"400 Error, Bad Data"}, function() {});
-											if (typeof(fail_func) == "function") {
-												fail_func(ajax_request);
-											}
-								}
-								else if (ajax_request.status == 404) {
-											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"404 Error, This site does not have a cPanel"}, function() {});
-											if (typeof(fail_func) == "function") {
-												fail_func(ajax_request);
-											}
-								}
-								else {
-											chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:ajax_request.status+" Unknown Error"}, function() {});
-											if (typeof(fail_func) == "function") {
-												fail_func(ajax_request);
-											}
-								}
-					}
+		if (ajax_request.readyState == XMLHttpRequest.DONE ) {
+			if (ajax_request.response != null) {
+				// remove script tags
+				ajax_request.processed_response = ajax_request.response.replace(/[\r\n]*<script[\s\S]*?<\/script>[\r\n]*/g,"")
+				//remove style tags
+				ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<style[\s\S]*?<\/style>[\r\n]*/g,"");
+				//remove image tags
+				ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<img[\s\S]*?>[\r\n]*/g,"");
+			}
+			input.unshift(ajax_request);
+			if (ajax_request.status == 200) {
+				if (typeof(success_func) == "function") {
+					console.log(input);
+					success_func.apply(this, input);
+				}
+			}
+			else if (ajax_request.status == 400) {
+				chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"400 Error, Bad Data"}, function() {});
+				if (typeof(fail_func) == "function") {
+					fail_func.apply(this, input);
+				}
+			}
+			else if (ajax_request.status == 404) {
+				chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:"404 Error, This site does not have a cPanel"}, function() {});
+				if (typeof(fail_func) == "function") {
+					fail_func.apply(this, input);
+				}
+			}
+			else {
+				chrome.runtime.sendMessage({target:"popup",title:"ajax-result",status:ajax_request.status+" Unknown Error"}, function() {});
+				if (typeof(fail_func) == "function") {
+					fail_func.apply(this, input);
+				}
+			}
+		}
 	}
 
 	var	post_get_value = "POST";
@@ -396,14 +347,19 @@ function display_parent_fields() {
 	var hidden_fields = document.getElementsByClassName("cp-hide-inparent");
 	var num_hidden_fields = hidden_fields.length;
 	
+	var display_text = "";
+	
 	for (var hfi = 0; hfi < hidden_fields.length;) {
 		hidden_fields[0].className = hidden_fields[0].className.replace("cp-hide-inparent","");
 	}
 	
 	if (num_hidden_fields > 0) {
-		return "Displayed "+num_hidden_fields+" parent fields";
+		display_text = "Displayed "+num_hidden_fields+" hidden parent fields";
+	} else {
+		display_text = "No hidden parent fields to display, they are already visible or this is not a parent product";
 	}
-	return "No parent fields to display, make sure your active";
+	
+	document.querySelector("#display_parent_fields .description").innerText = display_text;
 }
 
 // add link shipping zones on services and rates
@@ -426,9 +382,12 @@ function generate_zone_links() {
 	}
 	
 	if (num_zones_updated > 0) {
-		return "Converted "+num_zones_updated+" zones to links";
+		display_text = "Converted "+num_zones_updated+" zones to links";
+	} else {
+		display_text = "No zone links to convert";
 	}
-	return "No zone links to convert";
+	
+	document.querySelector("#add_zone_links .description").innerText = display_text;
 }
 
 function prepend_ship_ser_id() {
@@ -466,7 +425,7 @@ function add_sh_cat_to_methods(){
 	//making the services readable
 	prepend_ship_ser_id();
 	
-	return num_cat_added+" category(-y+ies) added to methods";
+	document.querySelector("#add_ship_cat .description").innerText = num_cat_added+" categories added to methods";
 }
 
 function click_element(element_to_click) {
@@ -509,13 +468,18 @@ function mark_orderlines_for_shipping() {
 	}
 	
 	if (orderlines_shipped > 0) {
-		return "Marked "+orderlines_shipped+" orderlines for shipping";
+		display_text = "Marked "+orderlines_shipped+" orderlines for shipping";
+	} else {
+		display_text = "There are no orderlines to mark for shipping";;
 	}
-	return "There are no orderlines to mark for shipping";
 	
+	document.querySelector("#ship_orderlines .description").innerText = display_text;
 }
 
 function add_all_export_fields() {
+	document.querySelector("#add_all_export button").disabled = true;
+	document.querySelector("#add_all_export .description").innerText = "Adding Fields Please Wait This May Take A While"
+	
 	var num_fields_added=0;
 	function add_field() {
 		document.querySelector("[href='javascript:addFields();']").click();
@@ -553,10 +517,12 @@ function add_all_export_fields() {
 				}
 			}
 		}
-		return "Added "+num_fields_added+" export fields to export wizard";
+		document.querySelector("#add_all_export .description").innerText = "Added "+num_fields_added+" export fields to export wizard";
+		document.querySelector("#add_all_export button").disabled = false;
 	} else {
-		return "Error: Page not viable for adding export fields";
+		document.querySelector("#add_all_export .description").innerText = "Error: Page not viable for adding export fields";
 	}
+	
 }
 
 function get_import_find_replace() {
@@ -594,7 +560,7 @@ function get_import_find_replace() {
 		repText = addCSVRow(repText);
 	}
 
-	return repText;
+	create_download_file("find_and_replace.csv", repText);
 
 	function addCSVCellFromElement(csvText, selector) {
 		var elem = document.querySelector(selector);
@@ -613,6 +579,19 @@ function get_import_find_replace() {
 	function addCSVRow(csvText) {
 		return csvText+'\n';
 	}
+}
+
+function create_download_file(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }
 
 function add_goto_search_element() {
@@ -859,151 +838,6 @@ function generate_filter_qs() {
 	return filter_qs;
 }
 
-// Page Load Automations
-chrome.storage.sync.get(null, function(stored_options) {
-	// automatically update filter page url
-	if (stored_options["auto-filter-page-url"]) {
-		auto_filter_setup();
-	}
-
-	// order
-	if (stored_options["auto-repair-order-url"]) {
-		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"order","page":"vieworder"}, ["id","warehouse"]);
-	}	
-	// advanced config
-	if (stored_options["auto-repair-adv-conf-url"]) {
-		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"config","page":"view"}, ["id","mod"]);
-	}
-	
-	// coupon
-	if (stored_options["auto-repair-coupon-url"]) {
-		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"discounts","page":"view"}, ["id"]);
-	}
-	
-	// refund
-	if (stored_options["auto-repair-refund-url"]) {
-		repair_url("/_cpanel/refund", {}, ["id"]);
-	}
-	
-	// shipping rates
-	if (stored_options["auto-repair-ship-rates-url"]) {
-		repair_url("/_cpanel/shippingcostmgr", {}, ["id"]);
-		repair_url("/_cpanel/shippingcostmgr/view", {}, ["id"]);
-	}
-	
-	// shipping methods
-	if (stored_options["auto-repair-ship-methods-url"]) {
-		repair_url("/_cpanel/shippinggroup", {}, ["id"]);
-		repair_url("/_cpanel/shippinggroup/view", {}, ["id"]);
-	}
-	
-	// payment terms
-	if (stored_options["auto-repair-pay-terms-url"]) {
-		repair_url("_cpanel/custerms", {}, ["id"]);
-	}
-	
-	// payment plan
-	if (stored_options["auto-repair-pay-plan-url"]) {
-		repair_url("/_cpanel/orderplan", {}, ["id"]);
-		repair_url("/_cpanel/orderplan/view", {}, ["id"]);
-	}
-	
-	// predefined package
-	if (stored_options["auto-repair-pre-pack-url"]) {
-		repair_url("/_cpanel/package", {}, ["id"]);
-		repair_url("/_cpanel/package/view", {}, ["id"]);
-	}
-	
-	// shipping groups
-	if (stored_options["auto-repair-ship-group-url"]) {
-		repair_url("/_cpanel/shippingid", {}, ["id"]);
-		repair_url("/_cpanel/shippingid/view", {}, ["id"]);
-	}
-	
-	// shipping zones
-	if (stored_options["auto-repair-ship-zone-url"]) {
-		repair_url("/_cpanel/zone", {}, ["id"]);
-		repair_url("/_cpanel/zone/view", {}, ["id"]);1
-	}
-	
-	// product groups
-	if (stored_options["auto-repair-prod-group-url"]) {
-		repair_url("/_cpanel/itemgroups", {}, ["id"]);
-		repair_url("/_cpanel/itemgroups/view", {}, ["id"]);
-	}
-	
-	// dispute reasons
-	if (stored_options["auto-repair-dispute-url"]) {
-		repair_url("/_cpanel/dispute_reasons", {}, ["id"]);
-		repair_url("/_cpanel/dispute_reasons/view", {}, ["id"]);
-	}
-	
-	// SEO Entry
-	if (stored_options["auto-repair-seo-url"]) {
-		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"seo","page":"view"}, ["id"]);
-	}
-	
-	// canned response
-	if (stored_options["auto-repair-canned-url"]) {
-		repair_url("/_cpanel/cannedresponses", {}, ["id"]);
-		repair_url("/_cpanel/cannedresponses/view", {}, ["id"]);
-	}
-	
-	// custom doc
-	if (stored_options["auto-repair-cus-doc-url"]) {
-		repair_url("/_cpanel/custom_docs", {}, ["id"]);
-		repair_url("/_cpanel/custom_docs/view", {}, ["id"]);
-	}
-		
-	// Custom document template sets
-	if (stored_options["auto-repair-seo-url"]) {
-		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"doctmpl","page":"view"}, ["id"]);
-	}
-	
-	// import/export templates
-	if (stored_options["auto-repair-imp-exp-url"]) {
-		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"dsimport","page":"view"}, ["id"]);
-		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"dsexport","page":"view"}, ["id"]);
-	}
-	
-	// custom configs
-	if (stored_options["auto-repair-cus-conf-url"]) {
-		repair_url("/_cpanel/custom_configs", {}, ["id"]);
-		repair_url("/_cpanel/custom_configs/view", {}, ["id"]);
-	}
-	
-	prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
-	prepend_ids_in_ship_matrix(stored_options["prepend-ids-in-ship-matrix"])
-	prepend_ids_in_label_config(stored_options["prepend-ids-in-label-config"])
-	append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
-	prepend_ship_ser_id();
-	
-	if (document.querySelector("[onclick='addShm()']") != null) {
-		document.querySelector("[onclick='addShm()']").addEventListener("click",function(){prepend_ship_ser_id()});
-	}
-	
-	// query string based automations
-	var current_qs = new queryString(window.location.search);
-
-	//auto-open magnifying glasses
-	var mags = current_qs.get_key('cf_mags');
-	if (mags != undefined && mags!="") {
-		var mags_array = mags.split(",");
-		for (mai = 0; mai < mags_array.length; mai++) {
-			var mag_num = mags_array[mai];
-			click_element(document.querySelector("[href='#collapse"+mag_num+"']"));
-		}
-	}
-	
-});
-
-if (window.location.hostname=="goto.production.neto.net.au" || window.location.hostname=="goto.neto.com.au") {
-	add_goto_search_element();
-}
-if (window.location.pathname=="/_cpanel/ebproclog") {
-	add_ebay_proc_search_element();
-}
-
 function check_eBay_process(ajax_response, reset = false) {
 
 	var total_running_ebay_proc_ids = [];
@@ -1074,56 +908,6 @@ function check_eBay_process(ajax_response, reset = false) {
 	}
 }
 
-function create_stuck_ebay_popup(){
-	var existing_popups = document.querySelectorAll("[id='stuck_ebay_proc_notify']");
-	for (var pop_i = 0; pop_i < existing_popups.length; pop_i++) {
-		var pop_elem = e_pop = existing_popups[pop_i];
-		e_pop.parentElement.removeChild(e_pop);
-	}
-	var new_popup = document.createElement("div");
-	new_popup.id = "stuck_ebay_proc_notify";
-	new_popup.style.position="absolute";
-	new_popup.style.right="0px";
-	new_popup.style.top="25%";
-	new_popup.style.width="300px";
-	new_popup.style.background="#083E52";
-	new_popup.style.color="white";
-	new_popup.style.padding="15px";
-	
-	
-	var message_text = document.createElement("span");
-	message_text.id = "stuck_ebay_message";
-	message_text.innerHTML = "It looks like this site has a stuck eBay process. You should take a look at <a href='https://www.neto.com.au/docs/ebay/troubleshooting-ebay/troubleshooting-orders-and-revisions/'>here</a>. Or just click the button below.";
-	message_text.style.width="100%";
-	message_text.style.float="left";
-	message_text.style.marginBottom="10px";
-	
-	var reset_button = document.createElement("button");
-	reset_button.id = "reset_ebay_batch_btn";
-	reset_button.innerText = "Reset eBay Batch Process";
-	reset_button.style.width="100%";
-	reset_button.style.float="left";
-	reset_button.style.marginBottom="10px";
-	reset_button.style.padding="6px";
-	
-	reset_button.addEventListener("click", function() {
-			make_ajax_request("/_cpanel/ebprocmgr?_ftr_status=Running","", function(ajax_response) {check_eBay_process(ajax_response, true)},null,true);
-	})
-	
-	var output_text = document.createElement("span");
-	output_text.id = "stuck_ebay_output";
-	output_text.innerText = "Ready";
-	output_text.style.width="100%";
-	output_text.style.float="left";
-	output_text.style.align="center";
-	
-	new_popup.appendChild(message_text);
-	new_popup.appendChild(reset_button);
-	new_popup.appendChild(output_text);
-	document.documentElement.appendChild(new_popup);
-	
-}
-
 function reset_ebay_batch(ajax_response) {
 	var ebay_batch_list = document.createElement("div");
 	ebay_batch_list.innerHTML = ajax_response.processed_response;
@@ -1192,13 +976,187 @@ function start_new_ebay_batch() {
 
 }
 
-//TODO remove below thats there for manual testing
-//create_stuck_ebay_popup();
+function initialise() {
 
-// check eBay backlog
-if (window.location.pathname.includes("_cpanel")) {
-//	make_ajax_request("/_cpanel/ebprocmgr?_ftr_status=Running","",check_eBay_process,null,true);
+		// Page Load Automations
+	chrome.storage.sync.get(null, function(stored_options) {
+		// automatically update filter page url
+		auto_filter_setup();
 
+		// order
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"order","page":"vieworder"}, ["id","warehouse"]);
+		// advanced config
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"config","page":"view"}, ["id","mod"]);
+
+		// coupon
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"discounts","page":"view"}, ["id"]);
+
+		// refund
+		repair_url("/_cpanel/refund", {}, ["id"]);
+
+		// shipping rates
+		repair_url("/_cpanel/shippingcostmgr", {}, ["id"]);
+		repair_url("/_cpanel/shippingcostmgr/view", {}, ["id"]);
+
+		// shipping methods
+		repair_url("/_cpanel/shippinggroup", {}, ["id"]);
+		repair_url("/_cpanel/shippinggroup/view", {}, ["id"]);
+
+		// payment terms
+		repair_url("_cpanel/custerms", {}, ["id"]);
+
+		// payment plan
+		repair_url("/_cpanel/orderplan", {}, ["id"]);
+		repair_url("/_cpanel/orderplan/view", {}, ["id"]);
+
+		// predefined package
+		repair_url("/_cpanel/package", {}, ["id"]);
+		repair_url("/_cpanel/package/view", {}, ["id"]);
+
+		// shipping groups
+		repair_url("/_cpanel/shippingid", {}, ["id"]);
+		repair_url("/_cpanel/shippingid/view", {}, ["id"]);
+
+		// shipping zones
+		repair_url("/_cpanel/zone", {}, ["id"]);
+		repair_url("/_cpanel/zone/view", {}, ["id"]);1
+		
+		// product groups
+		repair_url("/_cpanel/itemgroups", {}, ["id"]);
+		repair_url("/_cpanel/itemgroups/view", {}, ["id"]);
+		
+		// dispute reasons
+		repair_url("/_cpanel/dispute_reasons", {}, ["id"]);
+		repair_url("/_cpanel/dispute_reasons/view", {}, ["id"]);
+		
+		// SEO Entry
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"seo","page":"view"}, ["id"]);
+		
+		// canned response
+		repair_url("/_cpanel/cannedresponses", {}, ["id"]);
+		repair_url("/_cpanel/cannedresponses/view", {}, ["id"]);
+		
+		// custom doc
+		repair_url("/_cpanel/custom_docs", {}, ["id"]);
+		repair_url("/_cpanel/custom_docs/view", {}, ["id"]);
+			
+		// Custom document template sets
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"doctmpl","page":"view"}, ["id"]);
+		
+		// import/export templates
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"dsimport","page":"view"}, ["id"]);
+		repair_url("/cgi-bin/suppliers/index.cgi", {"item":"dsexport","page":"view"}, ["id"]);
+		
+		// custom configs
+		repair_url("/_cpanel/custom_configs", {}, ["id"]);
+		repair_url("/_cpanel/custom_configs/view", {}, ["id"]);
+		
+		prepend_method_ids_to_calc_ship(stored_options["prepend-view-order-method-ids"]);
+		prepend_ids_in_ship_matrix(stored_options["prepend-ids-in-ship-matrix"])
+		prepend_ids_in_label_config(stored_options["prepend-ids-in-label-config"])
+		append_id_to_cust_customer_fields(stored_options["append-id-to-cust-customer-fields"]);
+		prepend_ship_ser_id();
+		
+		if (document.querySelector("[onclick='addShm()']") != null) {
+			document.querySelector("[onclick='addShm()']").addEventListener("click",function(){prepend_ship_ser_id()});
+		}
+		
+		// query string based automations
+		var current_qs = new queryString(window.location.search);
+
+		//auto-open magnifying glasses
+		var mags = current_qs.get_key('cf_mags');
+		if (mags != undefined && mags!="") {
+			var mags_array = mags.split(",");
+			for (mai = 0; mai < mags_array.length; mai++) {
+				var mag_num = mags_array[mai];
+				click_element(document.querySelector("[href='#collapse"+mag_num+"']"));
+			}
+		}
+		
+		//automatically load control panel if one not already open
+		if (stored_options["enable-cPanel-auto-open"]) {
+			if (Date.now()-window.localStorage.getItem("last_cpanel_opened") > stored_options["cPanel-auto-open-delay"] && !/_cpanel/.test(window.location.pathname)) {
+				chrome.runtime.sendMessage({target:"background",title:"auto-open-cpanel",domain:window.location.hostname}, function() {});
+				window.localStorage.setItem("last_cpanel_opened", Date.now());
+			}
+		}
+		
+	});
+
+	if (window.location.pathname=="/_cpanel/ebproclog") {
+		add_ebay_proc_search_element();
+	}
+
+	// load the dialog box depending on auto close settings and possibly per domain settings
+	chrome.storage.sync.get(["close-tracking","helper-closed"], function(stored_options) {
+		var set_to_create = false;
+		switch(stored_options["close-tracking"]) {
+			case "globally":
+				if (!stored_options["helper-closed"]) {
+					createSidePanel();
+				}
+				break;
+			case "per-site":
+				if (window.localStorage.getItem("helper-closed")!="true") {
+					createSidePanel();
+				}
+				break;
+			case "none":
+				createSidePanel();
+				break;
+		} 
+	});
 }
 
-chrome.runtime.sendMessage({target:"popup",title:"page-reload",status:"Page Reloaded"}, function() {});
+function createSidePanel() {
+	console.log("make side panel?");
+	if (document.querySelector("#cPanel_checker_dialogue")==null) {
+		create_dialog_window();
+		create_purge_panel();
+
+		// TODO double check the check system and create ebay stuck proces poopup when needed
+		//create_stuck_ebay_popup();
+		create_context_panel();
+		create_info_panel();
+
+		// check eBay backlog
+		if (window.location.pathname.includes("_cpanel")) {
+		//	make_ajax_request("/_cpanel/ebprocmgr?_ftr_status=Running","",check_eBay_process,null,true);
+
+		}
+
+		// generate page info
+		start_page_analysis();
+	}
+	// track global closed
+	chrome.storage.sync.set({"helper-closed":false}, function() {});
+	// track per site closed
+	window.localStorage.setItem("helper-closed", false);
+}
+
+// don't initialise anything if not a Neto site. If we don't know if Neto site find out
+var cur_page_is_neto = localStorage.getItem('is_neto');
+
+if (cur_page_is_neto == null) {
+	function setIsNeto(response) {
+		cur_page_is_neto = true;
+		localStorage.setItem('is_neto', cur_page_is_neto);
+		initialise();
+	}
+	function setIsNotNeto(response) {
+		cur_page_is_neto = false;
+		localStorage.setItem('is_neto', cur_page_is_neto);
+	}
+	
+	make_ajax_request("/_cpanel","ajax=y", setIsNeto, setIsNotNeto);
+} else if (cur_page_is_neto.toLowerCase() == "true") {
+	initialise();
+}
+
+
+//Not neto site related hence does not occur within initialise
+if (window.location.hostname=="goto.production.neto.net.au" || window.location.hostname=="goto.neto.com.au") {
+	add_goto_search_element();
+}
+

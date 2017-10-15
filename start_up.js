@@ -5,29 +5,13 @@ chrome.runtime.onInstalled.addListener(function () {
 function initialise_options() {
 	chrome.storage.sync.get(null, function(stored_options) {
 		var default_options = {};
-		default_options["auto-filter-page-url"]=true;
-		default_options["auto-repair-order-url"]=true;
-		default_options["auto-repair-adv-conf-url"]=true;
-		default_options["auto-repair-coupon-url"]=true;
-		default_options["auto-repair-refund-url"]=true;
-		default_options["auto-repair-ship-rates-url"]=true;
-		default_options["auto-repair-ship-methods-url"]=true;
-		default_options["auto-repair-pay-terms-url"]=true;
-		default_options["auto-repair-pay-plan-url"]=true;
-		default_options["auto-repair-pre-pack-url"]=true;
-		default_options["auto-repair-ship-group-url"]=true;
-		default_options["auto-repair-ship-zone-url"]=true;
-		default_options["auto-repair-prod-group-url"]=true;
-		default_options["auto-repair-dispute-url"]=true;
-		default_options["auto-repair-seo-url"]=true;
-		default_options["auto-repair-canned-url"]=true;
-		default_options["auto-repair-cus-doc-url"]=true;
-		default_options["auto-repair-doc-temp-set-url"]=true;
-		default_options["auto-repair-imp-exp-url"]=true;
-		default_options["auto-repair-cus-conf-url"]=true;
 		default_options["prepend-view-order-method-ids"]=true;
 		default_options["append-id-to-cust-customer-fields"]=true;
 		default_options["prepend-ids-in-ship-matrix"]=true;
+		default_options["enable-cPanel-auto-open"]=true;
+		default_options["cPanel-auto-open-delay"]=0;
+		default_options["minimise-tracking"]="globally";
+		default_options["close-tracking"]="per-site";
 		
 		var def_opt_keys = Object.keys(default_options);
 		
@@ -56,8 +40,10 @@ function process_message(request, sender, sendResponse) {
  //interpret modifications
  switch (request.title) {
 		case "open-tab":
-   open_tab(request.url);
+			open_tab(request.url);
 			break;
+		case "auto-open-cpanel":
+			autoOpenCPanel(request.domain);
 		default:
  }
 }
@@ -65,3 +51,17 @@ function process_message(request, sender, sendResponse) {
 function open_tab(url) {
 	chrome.tabs.create({url:url,selected:false}, function (tabs) {});
 }
+
+function autoOpenCPanel(domain) {
+	chrome.tabs.query({url:["*://"+domain+"/_cpanel/*", "*://"+domain+"/cgi-bin/suppliers/index.cgi/*"]}, function (tabs_found) {
+		if (tabs_found.length == 0) {
+			chrome.tabs.create({url:"https://"+domain+"/_cpanel",selected:false}, function (tabs) {});
+		}
+	});
+}
+
+chrome.browserAction.onClicked.addListener(function callback(active_tab) {
+	console.log(active_tab);
+	chrome.tabs.sendMessage(active_tab.id, {target:"tab",title:"generate-dialog"}, null, function() {});
+
+});

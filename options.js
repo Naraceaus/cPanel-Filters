@@ -1,30 +1,23 @@
+var option_elements = document.querySelectorAll("input, select");
+
 // Saves options to chrome.storage
 function save_options() {
 		var on_page_options ={};
-  on_page_options["auto-filter-page-url"] = document.getElementById('auto-filter-page-url').checked;
-  on_page_options["auto-repair-order-url"] = document.getElementById('auto-repair-order-url').checked;
-  on_page_options["auto-repair-adv-conf-url"] = document.getElementById('auto-repair-adv-conf-url').checked;
-  on_page_options["auto-repair-coupon-url"] = document.getElementById('auto-repair-coupon-url').checked;
-  on_page_options["auto-repair-refund-url"] = document.getElementById('auto-repair-refund-url').checked;
-  on_page_options["auto-repair-ship-rates-url"] = document.getElementById('auto-repair-ship-rates-url').checked;
-  on_page_options["auto-repair-ship-methods-url"] = document.getElementById('auto-repair-ship-methods-url').checked;
-  on_page_options["auto-repair-pay-terms-url"] = document.getElementById('auto-repair-pay-terms-url').checked;
-  on_page_options["auto-repair-pay-plan-url"] = document.getElementById('auto-repair-pay-plan-url').checked;
-  on_page_options["auto-repair-pre-pack-url"] = document.getElementById('auto-repair-pre-pack-url').checked;
-  on_page_options["auto-repair-ship-group-url"] = document.getElementById('auto-repair-ship-group-url').checked;
-  on_page_options["auto-repair-ship-zone-url"] = document.getElementById('auto-repair-ship-zone-url').checked;
-  on_page_options["auto-repair-prod-group-url"] = document.getElementById('auto-repair-prod-group-url').checked;
-  on_page_options["auto-repair-dispute-url"] = document.getElementById('auto-repair-dispute-url').checked;
-  on_page_options["auto-repair-seo-url"] = document.getElementById('auto-repair-seo-url').checked;
-  on_page_options["auto-repair-canned-url"] = document.getElementById('auto-repair-canned-url').checked;
-  on_page_options["auto-repair-cus-doc-url"] = document.getElementById('auto-repair-cus-doc-url').checked;
-  on_page_options["auto-repair-doc-temp-set-url"] = document.getElementById('auto-repair-doc-temp-set-url').checked;
-  on_page_options["auto-repair-imp-exp-url"] = document.getElementById('auto-repair-imp-exp-url').checked;
-  on_page_options["auto-repair-cus-conf-url"] = document.getElementById('auto-repair-cus-conf-url').checked;
-  on_page_options["prepend-view-order-method-ids"] = document.getElementById('prepend-view-order-method-ids').checked;
-  on_page_options["append-id-to-cust-customer-fields"] = document.getElementById('append-id-to-cust-customer-fields').checked;
-  on_page_options["prepend-ids-in-ship-matrix"] = document.getElementById('prepend-ids-in-ship-matrix').checked;
 		
+		for (var oei = 0; oei < option_elements.length; oei++) {
+			var option_elem = option_elements[oei];
+			var option_key = option_elem.id;
+			switch(option_elem.type) {
+				case "checkbox":
+					on_page_options[option_key] = option_elem.checked;
+					break;
+				case "text":
+				default:
+					on_page_options[option_key] = option_elem.value;
+					break;
+			}
+		}
+			
 		// Update status to let user know options were saved.
 		var save_btn = document.getElementById('save');
 		save_btn.textContent = 'Saving...';
@@ -39,29 +32,24 @@ function save_options() {
 // Load options from extension onto page
 function load_options() {
 	chrome.storage.sync.get(null, function(stored_options) {
-			document.getElementById('auto-filter-page-url').checked = stored_options["auto-filter-page-url"];
-			document.getElementById('auto-repair-order-url').checked = stored_options["auto-repair-order-url"];
-			document.getElementById('auto-repair-adv-conf-url').checked = stored_options["auto-repair-adv-conf-url"];
-			document.getElementById('auto-repair-coupon-url').checked = stored_options["auto-repair-coupon-url"];
-			document.getElementById('auto-repair-refund-url').checked = stored_options["auto-repair-refund-url"];
-			document.getElementById('auto-repair-ship-rates-url').checked = stored_options["auto-repair-ship-rates-url"];
-			document.getElementById('auto-repair-ship-methods-url').checked = stored_options["auto-repair-ship-methods-url"];
-			document.getElementById('auto-repair-pay-terms-url').checked = stored_options["auto-repair-pay-terms-url"];
-			document.getElementById('auto-repair-pay-plan-url').checked = stored_options["auto-repair-pay-plan-url"];
-			document.getElementById('auto-repair-pre-pack-url').checked = stored_options["auto-repair-pre-pack-url"];
-			document.getElementById('auto-repair-ship-group-url').checked = stored_options["auto-repair-ship-group-url"];
-			document.getElementById('auto-repair-ship-zone-url').checked = stored_options["auto-repair-ship-zone-url"];
-			document.getElementById('auto-repair-prod-group-url').checked = stored_options["auto-repair-prod-group-url"];
-			document.getElementById('auto-repair-dispute-url').checked = stored_options["auto-repair-dispute-url"];
-			document.getElementById('auto-repair-seo-url').checked = stored_options["auto-repair-seo-url"];
-			document.getElementById('auto-repair-canned-url').checked = stored_options["auto-repair-canned-url"];
-			document.getElementById('auto-repair-cus-doc-url').checked = stored_options["auto-repair-cus-doc-url"];
-			document.getElementById('auto-repair-doc-temp-set-url').checked = stored_options["auto-repair-doc-temp-set-url"];
-			document.getElementById('auto-repair-imp-exp-url').checked = stored_options["auto-repair-imp-exp-url"];
-			document.getElementById('auto-repair-cus-conf-url').checked = stored_options["auto-repair-cus-conf-url"];
-			document.getElementById('prepend-view-order-method-ids').checked = stored_options["prepend-view-order-method-ids"];
-			document.getElementById('append-id-to-cust-customer-fields').checked = stored_options["append-id-to-cust-customer-fields"];
-			document.getElementById('prepend-ids-in-ship-matrix').checked = stored_options["prepend-ids-in-ship-matrix"];
+		console.log();
+		for (var oei = 0; oei < option_elements.length; oei++) {
+			var option_elem = option_elements[oei];
+			var option_val = stored_options[option_elem.id];
+			console.log(option_elem, option_val);
+			if (option_val != null) {
+				switch(option_elem.type) {
+					case "checkbox":
+						option_elem.checked = option_val;
+						break;
+					case "text":
+					default:
+						option_elem.value = option_val;
+						break;
+				} 
+			}
+		}
+		
 	});
 }
 

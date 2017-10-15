@@ -4,106 +4,6 @@
 <body>
 
 <label>
-  <input type="checkbox" id="auto-filter-page-url">
-  Automatically update filter page URL
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-order-url">
-  Repair order URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-adv-conf-url">
-  Repair advanced config URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-coupon-url">
-  Repair coupon URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-refund-url">
-  Repair refund URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-ship-rates-url">
-  Repair shipping rates URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-ship-methods-url">
-  Repair shipping method URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-pay-terms-url">
-  Repair payment term URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-pay-plan-url">
-  Repair payment plans URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-pre-pack-url">
-  Repair predefined packaging URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-ship-group-url">
-  Repair shipping group URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-ship-zone-url">
-  Repair shipping zone URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-prod-group-url">
-  Repair product group URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-dispute-url">
-  Repair product group URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-seo-url">
-  Repair SEO items URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-canned-url">
-  Repair canned responses URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-cus-doc-url">
-  Repair cusom documents URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-doc-temp-set-url">
-  Repair custom document template sets URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-imp-exp-url">
-  Repair import/export template URLs
-</label>
-<br>
-<label>
-  <input type="checkbox" id="auto-repair-cus-conf-url">
-  Repair custom config URLs
-</label>
-<br>
-<label>
   <input type="checkbox" id="prepend-view-order-method-ids">
   Display Ship Method IDs In Calc Shipping On Order Page
 </label>
@@ -116,6 +16,34 @@
 <label>
   <input type="checkbox" id="append-id-to-cust-customer-fields">
   Display Custom Customer Field IDs on Customer Card
+</label>
+<br>
+<label>
+  <input type="checkbox" id="enable-cPanel-auto-open">
+  Enable automatically opening a Neto site's control panel if none already open.
+</label>
+<br>
+<label>
+  <input type="text" id="cPanel-auto-open-delay">
+  When automatically opening Neto cPanel's, this is the delay between repeating such an action. This is measured in milliseconds.
+</label>
+<br>
+<label>
+	<select id="minimise-tracking">
+		<option value="none">Do Not Track</option>
+		<option value="per-site">Track Per Domain</option>
+		<option value="globally">Track Globally</option>
+	</select>
+  How to track whether the helper is minimised or not. When not tracked the addon will always load maximised.
+</label>
+<br>
+<label>
+	<select id="close-tracking">
+		<option value="none">Do Not Track</option>
+		<option value="per-site">Track Per Domain</option>
+		<option value="globally">Track Globally</option>
+	</select>
+  How to track whether the helper is automatically loaded. When not tracked the addon can only be generated manually via the addons icon in the top right of the page.
 </label>
 <br>
 
