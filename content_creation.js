@@ -43,7 +43,7 @@ function create_element(type, attributes, style) {
 }
 
 
-function apply_styles(element, style) {
+function apply_styles(element, style, store_ident) {
 	
 	var style_keys = Object.keys(style);
 	for (var si = 0; si < style_keys.length; si++) {
@@ -51,7 +51,22 @@ function apply_styles(element, style) {
 		var style_value = style[style_keys[si]];
 		
 		element.style[style_name] = style_value;
+		if (store_ident != "") {
+			window.localStorage.setItem(store_ident+"_"+style_name, style_value);
+		}
+		
 	}
+}
+
+function loadStyleFromLocal(element, store_ident, style_arr, ignore_blank) {
+	for (var si = 0; si < style_arr.length; si++) {
+		var style = style_arr[si];
+		var style_value = window.localStorage.getItem(store_ident+"_"+style);
+		if (ignore_blank != true || (style != null && style != "")) {
+			element.style[style] = style_value;
+		}
+	}
+	
 }
 
 function create_select(option_values, option_text, selected_value, attributes, style) {
@@ -110,7 +125,7 @@ function create_dialog_window() {
 
 	
     hover_styles.sheet.insertRule(`
-		.tooltip {
+		 #cPanel_checker_dialogue .tooltip {
 			opacity: 1;  
 			position:relative;
 			white-space:initial;
@@ -127,7 +142,7 @@ function create_dialog_window() {
 	`,0);
 	//styling to make tooltips work+
 	hover_styles.sheet.insertRule(`
-		.tooltip::before {
+		#cPanel_checker_dialogue .tooltip::before {
 			content: attr(data-tip);
 			font-size: 10px;
 			position:absolute;
@@ -143,9 +158,32 @@ function create_dialog_window() {
 		}
 	`,0);
     hover_styles.sheet.insertRule(`
-		.tooltip:hover::before {
+		#cPanel_checker_dialogue .tooltip:hover::before {
 			opacity: 1;
 			bottom:35px;					
+		}
+	`,0);
+	
+	
+	// snap flex directions
+	hover_styles.sheet.insertRule(`
+		#cPanel_checker_dialogue.snap-top, #cPanel_checker_dialogue.snap-bottom {
+			flex-direction:column;					
+		}
+	`,0);
+	hover_styles.sheet.insertRule(`
+		#cPanel_checker_dialogue.snap-left, #cPanel_checker_dialogue.snap-right {
+			flex-direction:row;					
+		}
+	`,0);
+	hover_styles.sheet.insertRule(`
+		#cPanel_checker_dialogue.snap-top #ch_resize, #cPanel_checker_dialogue.snap-bottom #ch_resize {
+			flex-direction:row;					
+		}
+	`,0);
+	hover_styles.sheet.insertRule(`
+		#cPanel_checker_dialogue.snap-left #ch_resize, #cPanel_checker_dialogue.snap-right #ch_resize {
+			flex-direction:column;					
 		}
 	`,0);
 	
@@ -161,7 +199,7 @@ function create_dialog_window() {
 				width:"420px",
 				background:"#1599ca",
 				display:"flex",
-				flexDirection:"row",
+				//flexDirection:"row",
 				zIndex:"1000001"
 		}
 	)
@@ -193,12 +231,11 @@ function create_dialog_window() {
 			background:"#1599ca",
 			
 			display:"flex",
-			flexDirection:"column",
+			//flexDirection:"column",
 			justifyContent:"space-around"
 		}
 	)
 	dialog.appendChild(task_bar);
-	
 	
 	var remove_dialog_btn = create_element("div", 
 		{
@@ -250,6 +287,15 @@ function create_dialog_window() {
 	task_bar.appendChild(drag_dialog_btn);
 
 	document.documentElement.appendChild(dialog);
+	
+	// positioning task bar and dialog window based on last drag
+	loadStyleFromLocal(dialog, "NH_main_pos", ["top", "left", "bottom","right"], true);
+	var local_snap_to = window.localStorage.getItem("NH_main_pos_snapTo");
+	
+	if (local_snap_to != null && local_snap_to!= "") {
+		dialog.className = dialog.className.replace(/(left|top|right|bottom)/g, local_snap_to);
+		shiftTaskBar(local_snap_to);
+	}
 
 	// auto minimise the dialog box depending on aut mimisnse settings qand possibly per domain settings
 	chrome.storage.sync.get(["minimise-tracking","helper-minimised"], function(stored_options) {
@@ -569,14 +615,14 @@ function shiftTaskBar(direction) {
 	if (direction == "top" || direction == "bottom") {
 		task_bar_elem.style.height=task_bar_narrow;
 		task_bar_elem.style.width="initial";
-		task_bar_elem.style.flexDirection = "row";
-		parent_elem.style.flexDirection = "column";
+		//task_bar_elem.style.flexDirection = "row";
+		//parent_elem.style.flexDirection = "column";
 	}
 	if (direction == "left" || direction == "right") {
 		task_bar_elem.style.height="initial";
 		task_bar_elem.style.width="task_bar_narrow";
-		task_bar_elem.style.flexDirection = "column";
-		parent_elem.style.flexDirection = "row";
+		//task_bar_elem.style.flexDirection = "column";
+		//parent_elem.style.flexDirection = "row";
 	}
 	//parent_elem.removeChild(task_bar_elem);
 	if (direction == "top" || direction == "left") {
@@ -659,9 +705,11 @@ function dragMainPanel(start_elem) {
 		
 		//snap_styles[snap_to] = "0px";
 		
-		main_panel.className = main_panel.className.replace(/(left|top|right|bottom)/g, snap_to)
+		main_panel.className = main_panel.className.replace(/(left|top|right|bottom)/g, snap_to);
 		
-		apply_styles(main_panel, snap_styles);
+		window.localStorage.setItem("NH_main_pos_snapTo", snap_to);
+		
+		apply_styles(main_panel, snap_styles, "NH_main_pos");
 	}
 
 	function closeDragElement() {
