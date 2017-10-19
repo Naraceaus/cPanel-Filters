@@ -13,16 +13,16 @@ function check_login(ajax_response) {
 		make_ajax_request("/_cpanel/setup_wizard/webshopconfig","",process_webstore_response,null,true);
 		// checking local page content to determine type of webpage
 		get_page_info(true, true);
+		autoOpenCPanel();
 		
 	} else if (ajax_response.responseText == "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
 		set_pi_value("logged-in", "No");
 		set_pi_value("default-theme", "n.a.");
 		set_pi_value("active-theme", "n.a.");
 		get_page_info(true, false);
-		
+		autoOpenCPanel();
 	} else {
-		//todo errors for bool
-		//this.logged_in = "Addon is confused, contact developer with the website you are viewing"
+		noCPanel(ajax_response);
 	}
 
 }
@@ -34,6 +34,18 @@ function noCPanel(ajax_response) {
 	set_pi_value("default-theme", "n.a.");
 	set_pi_value("active-theme", "n.a.");
 	set_pi_value("cpanel-link", "n.a.");
+}
+
+function autoOpenCPanel() {
+	chrome.storage.sync.get(["enable-cPanel-auto-open","cPanel-auto-open-delay"], function(stored_options) {
+		//automatically load control panel if one not already open
+		if (stored_options["enable-cPanel-auto-open"]) {
+			if (Date.now()-window.localStorage.getItem("last_cpanel_opened") > stored_options["cPanel-auto-open-delay"] && !/_cpanel/.test(window.location.pathname)) {
+				chrome.runtime.sendMessage({target:"background",title:"auto-open-cpanel",domain:window.location.hostname}, function() {});
+				window.localStorage.setItem("last_cpanel_opened", Date.now());
+			}
+		}
+	});
 }
 
 function process_webstore_response(response) {
