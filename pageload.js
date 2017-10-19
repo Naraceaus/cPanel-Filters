@@ -1083,7 +1083,13 @@ function initialise() {
 			}
 		}
 		
-
+		//automatically load control panel if one not already open
+		if (stored_options["enable-cPanel-auto-open"]) {
+			if (Date.now()-window.localStorage.getItem("last_cpanel_opened") > stored_options["cPanel-auto-open-delay"] && !/_cpanel/.test(window.location.pathname)) {
+				chrome.runtime.sendMessage({target:"background",title:"auto-open-cpanel",domain:window.location.hostname}, function() {});
+				window.localStorage.setItem("last_cpanel_opened", Date.now());
+			}
+		}
 		
 	});
 
