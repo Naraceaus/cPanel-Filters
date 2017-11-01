@@ -104,16 +104,12 @@ function create_dialog_window() {
 	// Append style element to head
 	document.head.appendChild(hover_styles);
 
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left {left:0px !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top {top:0px !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-right {right:0px !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom {bottom:0px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left {left:0px !important; justify-content:flex-start !important}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top {top:0px !important; justify-content:flex-start !important}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-right {right:0px !important; justify-content:flex-end !important}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom {bottom:0px !important; justify-content:flex-end !important}",0);
 
-
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize:hover #ch_items_cont {display:flex !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize #ch_items_cont {display:none !important;}",0);
-
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left #ch_resize,#cPanel_checker_dialogue.snap-right #ch_resize {width:"+task_bar_narrow+" !important;min-height:324px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left #ch_resize,#cPanel_checker_dialogue.snap-right #ch_resize {min-width:"+task_bar_narrow+" !important;min-height:324px !important;}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top #ch_resize,#cPanel_checker_dialogue.snap-bottom #ch_resize {min-height:"+task_bar_narrow+" !important;}",0);
 
 	// min height for left and right snap
@@ -198,6 +194,8 @@ function create_dialog_window() {
 				top:"25%",
 				width:"420px",
 				transition:"width 0.3s, max-height 0.3s",
+				transitionTimingFunction:"linear",
+				overflow:"hidden",
 				background:"#1599ca",
 				display:"flex",
 				//flexDirection:"row",
@@ -576,7 +574,9 @@ function create_info_panel() {
 			{
 				width:"25%",
 				float:"left",
-				height:"32px"
+				height:"32px",
+				whiteSpace:"nowrap",
+				overflowX:"hidden"
 			}
 		);
 		info_main.appendChild(pi_label);
