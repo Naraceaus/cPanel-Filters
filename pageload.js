@@ -56,8 +56,11 @@ function check_element_add_filter(pot_elem, start_fil_qs){
 		}
 	} // else check if value exists
 	else if (pot_elem.value!=null) {
+		console.log(pot_elem.getAttribute("name"), pot_elem.value != "", start_fil_qs.get_key(pot_elem.getAttribute("name")), start_fil_qs.get_key(pot_elem.getAttribute("name")) != null);
 		if (pot_elem.value != "") {
 			new_fil_qs.add_key(pot_elem.getAttribute("name"), pot_elem.value);
+		} else if (start_fil_qs.get_key(pot_elem.getAttribute("name")) != null) {
+			new_fil_qs.remove_key(pot_elem.getAttribute("name"));
 		}
 	}
 	return new_fil_qs;
@@ -68,6 +71,7 @@ function update_window_url() {
 }
 
 function auto_filter_setup() {
+	console.log("generateurl");
 	var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
 	for (var fil_i = 0; fil_i < filter_elements.length; fil_i++) {
 		filter_elements[fil_i].addEventListener('input', function() {update_window_url()});
