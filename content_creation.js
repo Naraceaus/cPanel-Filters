@@ -51,7 +51,7 @@ function apply_styles(element, style, store_ident) {
 		var style_value = style[style_keys[si]];
 		
 		element.style[style_name] = style_value;
-		if (store_ident != "") {
+		if (store_ident != "" && store_ident != null) {
 			window.localStorage.setItem(store_ident+"_"+style_name, style_value);
 		}
 		
@@ -62,7 +62,7 @@ function loadStyleFromLocal(element, store_ident, style_arr, ignore_blank) {
 	for (var si = 0; si < style_arr.length; si++) {
 		var style = style_arr[si];
 		var style_value = window.localStorage.getItem(store_ident+"_"+style);
-		if (ignore_blank != true || (style != null && style != "")) {
+		if (ignore_blank != true || (style_value != null && style_value != "")) {
 			element.style[style] = style_value;
 		}
 	}
@@ -203,7 +203,7 @@ function create_dialog_window() {
 				zIndex:"1000001"
 		}
 	)
-	
+		
 	// main content
 	var items_container = create_element("div", 
 		{
@@ -287,16 +287,16 @@ function create_dialog_window() {
 	task_bar.appendChild(drag_dialog_btn);
 
 	document.documentElement.appendChild(dialog);
-	
+		
 	// positioning task bar and dialog window based on last drag
 	loadStyleFromLocal(dialog, "NH_main_pos", ["top", "left", "bottom","right"], true);
 	var local_snap_to = window.localStorage.getItem("NH_main_pos_snapTo");
-	
+		
 	if (local_snap_to != null && local_snap_to!= "") {
 		dialog.className = dialog.className.replace(/(left|top|right|bottom)/g, local_snap_to);
 		shiftTaskBar(local_snap_to);
 	}
-
+	
 	// auto minimise the dialog box depending on aut mimisnse settings qand possibly per domain settings
 	chrome.storage.sync.get(["minimise-tracking","helper-minimised"], function(stored_options) {
 		switch(stored_options["minimise-tracking"]) {
@@ -720,7 +720,6 @@ function dragMainPanel(start_elem) {
 }
 
 function toggleMinimize(set_minimised) {
-	console.log("toggle minimize");
 	var minimised=true;
 	var main_panel = document.querySelector("#cPanel_checker_dialogue");
 	if (main_panel.className.includes("auto-minimize") && set_minimised!=true || set_minimised==false) {
