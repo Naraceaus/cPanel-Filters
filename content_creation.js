@@ -1,6 +1,6 @@
 
-var task_bar_narrow = "20px";
-var task_bar_expanded = "324px";
+var task_bar_narrow = "35px";
+var task_bar_length = "420px";
 
 function create_element(type, attributes, style) {
 	// make saure style and attributes are actually objects
@@ -11,19 +11,28 @@ function create_element(type, attributes, style) {
 		attributes={};
 	}
 	
+	if (style.margin!=null) {
+		console.log(style.margin);
+		console.log(style);
+		console.log("boop");
+	}
+	
 	//set default values if not specified (helps prevent in page styling affecting the popup
 	var def_styles = {
 		fontSize:"14px",
 		color:"black",
 		padding:"initial",
-		margin:"initial",
+		//margin:"initial",
 		fontFamily:"arial",
-		borderRadius:"initial"
+		borderRadius:"initial",
+		boxSizing:"border-box",
+		fontWeight:"initial"
 	}
 	var def_style_keys = Object.keys(def_styles);
 	for (var dsi = 0; dsi < def_style_keys.length; dsi++) {
 		if (style[def_style_keys[dsi]] == null) {
 			style[def_style_keys[dsi]] = def_styles[def_style_keys[dsi]];
+			
 		}
 		
 	}
@@ -109,13 +118,13 @@ function create_dialog_window() {
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-right {right:0px !important; justify-content:flex-end !important}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom {bottom:0px !important; justify-content:flex-end !important}",0);
 
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left #ch_resize,#cPanel_checker_dialogue.snap-right #ch_resize {min-width:"+task_bar_narrow+" !important;min-height:324px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left #ch_resize,#cPanel_checker_dialogue.snap-right #ch_resize {min-width:"+task_bar_narrow+" !important;height:"+task_bar_length+" !important;}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top #ch_resize,#cPanel_checker_dialogue.snap-bottom #ch_resize {min-height:"+task_bar_narrow+" !important;}",0);
 
 	// min height for left and right snap
 
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left,#cPanel_checker_dialogue.auto-minimize.snap-right {width:"+task_bar_narrow+" !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left:hover,#cPanel_checker_dialogue.auto-minimize.snap-right:hover {width:420px !important}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left,#cPanel_checker_dialogue.auto-minimize.snap-right {width:"+task_bar_narrow+" !important;max-height:"+task_bar_length+";}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left:hover,#cPanel_checker_dialogue.auto-minimize.snap-right:hover {width:420px !important;max-height:initial;}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-top,#cPanel_checker_dialogue.auto-minimize.snap-bottom {max-height:"+task_bar_narrow+" !important;}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-top:hover,#cPanel_checker_dialogue.auto-minimize.snap-bottom:hover {height:auto !important;max-height:600px !important;}",0);
 
@@ -133,7 +142,7 @@ function create_dialog_window() {
 			line-height:initial;
 			height:initial;
 			opacity:initial;  
-			transition:initial; 	
+			transition:initial;
 		}
 	`,0);
 	//styling to make tooltips work+
@@ -150,7 +159,7 @@ function create_dialog_window() {
 			color:#e0e0e0;
 			padding:7px 7px;
 			opacity: 0;  
-			transition:opacity 0.4s ease-out; 						
+			transition:opacity 0.4s ease-out;				
 		}
 	`,0);
     hover_styles.sheet.insertRule(`
@@ -183,6 +192,22 @@ function create_dialog_window() {
 		}
 	`,0);
 	
+	//corner curve on dialog box
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left {border-radius: 0px 20px 20px 0px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top {border-radius: 0px 0px 20px 20px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-right {border-radius: 20px 0px 0px 20px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom {border-radius: 20px 20px 0px 0px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left:not(:hover),#cPanel_checker_dialogue.auto-minimize.snap-top:not(:hover),#cPanel_checker_dialogue.auto-minimize.snap-right:not(:hover),#cPanel_checker_dialogue.auto-minimize.snap-bottom:not(:hover){border-radius: initial !important;}",0);
+	
+	// generic styling (padding, borders colour etc)
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .min-vert-padding {padding: 5px 0px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .min-vert-margin {margin-bottom: 5px}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .minor-heading {background: #558B6E !important; font-size: 16px !important; border-radius:5px 5px 0px 0px !important; padding: 5px 0px !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .basic-text {background: #DDCFAD !important;}",0);
+	
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue label, #cPanel_checker_dialogue button {cursor:pointer;}",0);
+
+	
 	var dialog = create_element("div",
 		{
 			id:"cPanel_checker_dialogue",
@@ -190,15 +215,13 @@ function create_dialog_window() {
 		},
 		{
 				position:"fixed",
-				//right:"0px",
 				top:"25%",
 				width:"420px",
-				transition:"width 0.3s, max-height 0.3s",
+				transition:"width 0.1s, max-height 0.1s",
 				transitionTimingFunction:"linear",
 				overflow:"hidden",
 				background:"#1599ca",
 				display:"flex",
-				//flexDirection:"row",
 				zIndex:"1000001"
 		}
 	)
@@ -211,7 +234,7 @@ function create_dialog_window() {
 		{
 			width:"400px",
 			background:"#1599ca",
-			
+			padding:"15px",
 			display:"flex",
 			flexDirection:"column"
 		}
@@ -244,7 +267,7 @@ function create_dialog_window() {
 		{
 			height:"100%",	
 			width:"100%",	
-			background:"red"
+			background:"#E54034"
 		}
 	)
 	
@@ -260,7 +283,7 @@ function create_dialog_window() {
 		{
 			height:"100%",	
 			width:"100%",
-			background:"aqua"
+			background:"#F0C808"
 		}
 	)
 	min_dialog_btn.addEventListener("click", toggleMinimize);
@@ -277,7 +300,7 @@ function create_dialog_window() {
 			width:"100%",	
 			cursor:"move",
 			zIndex:"1000001",
-			background:"lavender"
+			background:"#8e846b"
 		}
 	)
 
@@ -314,9 +337,25 @@ function create_dialog_window() {
 
 //purge cache buttons
 function create_purge_panel() {
+	var purge_heading = create_element("div", 
+		{
+			id:"purge_heading",
+			innerText:"Page Server Cache",
+			className: "minor-heading"
+		},
+		{
+			width:"100%",
+			textAlign:"center"
+			
+		}
+	);
+	
+	document.querySelector("#ch_items_cont").appendChild(purge_heading);
+
 	var purge_panel = create_element("div", 
 		{
-			id: "ch_purge_panel"
+			id: "ch_purge_panel",
+			className: "basic-text min-vert-margin"
 		},
 		{
 			width:"100%",
@@ -326,7 +365,7 @@ function create_purge_panel() {
 
 	var heavy_cont = create_element("div", 
 		{
-			innerText: "Heavily: "
+			className:"min-vert-padding"
 		},
 		{
 			width:"50%",
@@ -336,6 +375,19 @@ function create_purge_panel() {
 	);
 	
 	purge_panel.appendChild(heavy_cont);
+	
+	var heavy_label = create_element("label", 
+		{
+			innerText: "Heavily: "
+		},
+		{
+			margin:"0",
+			padding:"0",
+			display:"initial"
+		}
+	);
+	
+	heavy_cont.appendChild(heavy_label);
 	
 	var heavy_chk = create_element("input", 
 		{
@@ -347,11 +399,11 @@ function create_purge_panel() {
 	get_check_box_checked("heavy_purge");
 	heavy_chk.addEventListener("click", store_check_box_checked);
 	
-	heavy_cont.appendChild(heavy_chk);
+	heavy_label.appendChild(heavy_chk);
 	
 	var refresh_cont = create_element("div", 
 		{
-			innerText:"Refresh:"
+			className:"min-vert-padding"
 		},
 		{
 			width:"50%",
@@ -361,6 +413,19 @@ function create_purge_panel() {
 	);
 
 	purge_panel.appendChild(refresh_cont);
+	
+	var refresh_label = create_element("label", 
+		{
+			innerText: "Refresh: "
+		},
+		{
+			margin:"0",
+			padding:"0",
+			display:"initial"
+		}
+	);
+	
+	refresh_cont.appendChild(refresh_label);
 	
 	var refresh_chk = create_element("input", 
 		{
@@ -372,15 +437,18 @@ function create_purge_panel() {
 	get_check_box_checked("refresh_purge");
 	refresh_chk.addEventListener("click", store_check_box_checked);
 	
-	refresh_cont.appendChild(refresh_chk);
+	refresh_label.appendChild(refresh_chk);
 	
 	var purge_btn = create_element("button", 
 		{
 			id:"purge_btn",
-			innerText: "Purge"
+			innerText: "Purge",
+			className:"min-vert-margin min-vert-padding"
 		},
 		{
-			width:"100%",
+			width:"95%",
+			marginLeft:"2.5%",
+			marginRight:"2.5%",
 			textAlign:"center"
 		}
 	);
@@ -407,7 +475,8 @@ function create_context_panel() {
 	var context_heading = create_element("div", 
 		{
 			id:"context_heading",
-			innerText:"Page Specific Functions"
+			innerText:"Page Specific Functions",
+			className: "minor-heading"
 		},
 		{
 			width:"100%",
@@ -433,22 +502,32 @@ function create_context_panel() {
 		context_cont.appendChild(create_context_buttons("export_find_replace", "Using the button below you can grab all find and replace entries used in the template in csv format",get_import_find_replace,"Get Import/Export Find And Replace"));
 	}
 	
-	document.querySelector("#ch_items_cont").appendChild(context_cont);
+	if (context_cont.children.length > 1) {
+		document.querySelector("#ch_items_cont").appendChild(context_cont);
+	}
 }
 
 function create_context_buttons(context_id, description, btn_function, btn_title) {
 	var cont_el = create_element("div", {
-		id:context_id
+		id:context_id,
+		className:"basic-text min-vert-margin"
+	},{
+		"marginTop":"0px"
 	});
 	
 	var desc_el = create_element("div", {
-		className:"description",
+		className:"description min-vert-padding",
 		innerText:description
 	});
 	
 	var btn_el = create_element("button", {
-		className:"context_btn",
+		className:"context_btn min-vert-margin min-vert-padding",
 		innerText:btn_title
+	},{
+		width:"95%",
+		marginLeft:"2.5%",
+		marginRight:"2.5%",
+		textAlign:"center"
 	});
 
 	btn_el.addEventListener("click", btn_function);
@@ -504,22 +583,27 @@ function create_stuck_ebay_popup(){
 }
 
 function create_info_panel() {
-	var info_panel = create_element("div", 
-		{
-			id:"page-info-cont"
-		}
-	);
-	
 	var info_header = create_element("div", 
 		{
 			id:"page-info-header",
-			innerText: "Page Information"
+			innerText: "Page Information",
+			className: "minor-heading"
+		},{
+			width:"100%",
+			textAlign:"center"
 		}
 	);
 	
-	info_panel.appendChild(info_header);
+	document.querySelector("#ch_items_cont").appendChild(info_header);
+
+	var info_panel = create_element("div", 
+		{
+			id:"page-info-cont",
+			className:"basic-text"
+		}
+	);
 	
-	var info_header_text = create_element("span", 
+	var info_header_text = create_element("div", 
 		{
 			id:"page-info-load-text",
 			innerText: "Analysing Current Page"
@@ -545,7 +629,7 @@ function create_info_panel() {
 			labelText:"Page URL"
 		},{
 			id:"logged-in",
-			labelText:"Logged In (cPanel)"
+			labelText:"cPanel"
 		},{
 			id:"page-type",
 			labelText:"Page Type"
@@ -569,12 +653,12 @@ function create_info_panel() {
 		var pi_label = create_element("div", 
 			{
 				id:pelinfo.id+"-label",
-				innerText:pelinfo.labelText
+				innerText:pelinfo.labelText,
+				className:"min-vert-padding"
 			},
 			{
-				width:"25%",
+				width:"35%",
 				float:"left",
-				height:"32px",
 				whiteSpace:"nowrap",
 				overflowX:"hidden"
 			}
@@ -583,12 +667,12 @@ function create_info_panel() {
 		
 		var pi_elem = create_element("div", 
 			{
-				id:pelinfo.id
+				id:pelinfo.id,
+				className:"min-vert-padding"
 			},
 			{
-				width:"75%",
+				width:"65%",
 				float:"left",
-				height:"32px"
 			}
 		);
 		info_main.appendChild(pi_elem);
@@ -598,7 +682,8 @@ function create_info_panel() {
 				id:pelinfo.id+"-value",
 				value:"...",
 				type:"text",
-				disabled:true
+				disabled:true,
+				border:"none"
 			},
 			{
 				width:"95%"
@@ -606,6 +691,19 @@ function create_info_panel() {
 		);
 		pi_elem.appendChild(pi_input);
 		
+		if (pi < page_info_sections.length-1) {
+			var pi_spacer = create_element("hr",
+				{},
+				{
+					width:"100%",
+					margin:"0",
+					padding:"0",
+					border:"0",
+					borderTop:"solid 1px #558b6e"
+				}
+			);
+			info_main.appendChild(pi_spacer);			
+		}
 	}
 	document.querySelector("#ch_items_cont").appendChild(info_panel);
 }

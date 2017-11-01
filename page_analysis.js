@@ -8,7 +8,7 @@ function start_page_analysis() {
 function check_login(ajax_response) {
 	
 	if (ajax_response.responseText == "NSD1;#2|$7|content$0|$3|msg$0|") {
-		set_pi_value("logged-in", "Yes");
+		set_pi_value("logged-in", "Logged In");
 		// checking the webstore settings page
 		make_ajax_request("/_cpanel/setup_wizard/webshopconfig","",process_webstore_response,null,true);
 		// checking local page content to determine type of webpage
@@ -16,7 +16,7 @@ function check_login(ajax_response) {
 		autoOpenCPanel();
 		
 	} else if (ajax_response.responseText == "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
-		set_pi_value("logged-in", "No");
+		set_pi_value("logged-in", "Not Logged In");
 		set_pi_value("default-theme", "n.a.");
 		set_pi_value("active-theme", "n.a.");
 		get_page_info(true, false);
@@ -145,7 +145,7 @@ function logged_in_customer_email(request) {
 	page_cont.innerHTML = page_returned;
 	
 	var email = page_cont.querySelector("[name='email']").value;
-	set_pi_url("cpanel-link", window.location.origin+"/_cpanel/customer?_ftr_email="+email, "Don't forget to use the ctrl or cmd key to open in a new tab");
+	set_pi_url("cpanel-link", window.location.origin+"/_cpanel/customer?_ftr_email="+email);
 }
 
 find_direct_url_in_cpanel = function(request) {
@@ -160,7 +160,7 @@ find_direct_url_in_cpanel = function(request) {
 	} else {
 		direct_URL = "";
 	}
-	set_pi_url("cpanel-link", direct_URL, "Don't forget to use the ctrl or cmd key to open in a new tab")
+	set_pi_url("cpanel-link", direct_URL)
 }
 
 function set_pi_value(id, value) {
@@ -172,7 +172,8 @@ function set_pi_value(id, value) {
 				id:id+"-value",
 				value:"...",
 				type:"text",
-				disabled:true
+				disabled:true,
+				border:"none"
 			},
 			{
 				width:"95%"
@@ -191,7 +192,11 @@ function set_pi_url(id, url, tooltip) {
 		{
 			href:url,
 			innerText:url
-		});
+		},{
+			wordBreak:"break-all",
+			color:"#086b90"
+		}
+	);
 	
 	if (tooltip != null) {
 		pi_link.className = "tooltip";
