@@ -1,6 +1,6 @@
 
 var task_bar_narrow = "20px";
-
+var task_bar_expanded = "324px";
 
 function create_element(type, attributes, style) {
 	// make saure style and attributes are actually objects
@@ -114,14 +114,14 @@ function create_dialog_window() {
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize #ch_items_cont {display:none !important;}",0);
 
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left #ch_resize,#cPanel_checker_dialogue.snap-right #ch_resize {width:"+task_bar_narrow+" !important;min-height:324px !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top #ch_resize,#cPanel_checker_dialogue.snap-bottom #ch_resize {height:"+task_bar_narrow+" !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top #ch_resize,#cPanel_checker_dialogue.snap-bottom #ch_resize {min-height:"+task_bar_narrow+" !important;}",0);
 
 	// min height for left and right snap
 
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left,#cPanel_checker_dialogue.auto-minimize.snap-right {width:"+task_bar_narrow+" !important;}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left:hover,#cPanel_checker_dialogue.auto-minimize.snap-right:hover {width:420px !important}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-top,#cPanel_checker_dialogue.auto-minimize.snap-bottom {height:"+task_bar_narrow+" !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-top:hover,#cPanel_checker_dialogue.auto-minimize.snap-bottom:hover {height:initial !important}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-top,#cPanel_checker_dialogue.auto-minimize.snap-bottom {max-height:"+task_bar_narrow+" !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-top:hover,#cPanel_checker_dialogue.auto-minimize.snap-bottom:hover {height:auto !important;max-height:600px !important;}",0);
 
 	
     hover_styles.sheet.insertRule(`
@@ -190,13 +190,14 @@ function create_dialog_window() {
 	var dialog = create_element("div",
 		{
 			id:"cPanel_checker_dialogue",
-			className:"snap-right"
+			className:"snap-right auto-minimize"
 		},
 		{
 				position:"fixed",
 				//right:"0px",
 				top:"25%",
 				width:"420px",
+				transition:"width 0.3s, max-height 0.3s",
 				background:"#1599ca",
 				display:"flex",
 				//flexDirection:"row",
