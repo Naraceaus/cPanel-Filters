@@ -15,12 +15,18 @@ function check_login(ajax_response) {
 		get_page_info(true, true);
 		autoOpenCPanel();
 		
+		// just to make sure if the systemgets confused, loading helper manually can fix it for knowing a neto site is a neto site
+		localStorage.setItem('is_neto', true);
+		
 	} else if (ajax_response.responseText == "NSD1;#1|$5|error$13|NOT_LOGGED_IN") {
 		set_pi_value("logged-in", "Not Logged In");
 		set_pi_value("default-theme", "n.a.");
 		set_pi_value("active-theme", "n.a.");
 		get_page_info(true, false);
 		autoOpenCPanel();
+		
+		// just to make sure if the systemgets confused, loading helper manually can fix it for knowing a neto site is a neto site		
+		localStorage.setItem('is_neto', true);
 	} else {
 		noCPanel(ajax_response);
 	}

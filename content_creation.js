@@ -267,7 +267,8 @@ function create_dialog_window() {
 		{
 			height:"100%",	
 			width:"100%",	
-			background:"#E54034"
+			background:"#E54034",
+			cursor:"pointer"
 		}
 	)
 	
@@ -283,7 +284,8 @@ function create_dialog_window() {
 		{
 			height:"100%",	
 			width:"100%",
-			background:"#F0C808"
+			background:"#F0C808",
+			cursor:"pointer"
 		}
 	)
 	min_dialog_btn.addEventListener("click", toggleMinimize);
