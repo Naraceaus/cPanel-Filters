@@ -1096,23 +1096,26 @@ function initialise() {
 	}
 
 	// load the dialog box depending on auto close settings and possibly per domain settings
-	chrome.storage.sync.get(["close-tracking","helper-closed"], function(stored_options) {
+	chrome.storage.sync.get(["close-tracking","helper-closed","blacklist-domains"], function(stored_options) {
 		var set_to_create = false;
-		switch(stored_options["close-tracking"]) {
-			case "globally":
-				if (!stored_options["helper-closed"]) {
+		if (!(stored_options["blacklist-domains"].includes(window.location.hostname))) {
+			console.log(window.location.hostname + " not in " + stored_options["blacklist-domains"])
+			switch(stored_options["close-tracking"]) {
+				case "globally":
+					if (!stored_options["helper-closed"]) {
+						createSidePanel();
+					}
+					break;
+				case "per-site":
+					if (window.localStorage.getItem("helper-closed")!="true") {
+						createSidePanel();
+					}
+					break;
+				case "none":
 					createSidePanel();
-				}
-				break;
-			case "per-site":
-				if (window.localStorage.getItem("helper-closed")!="true") {
-					createSidePanel();
-				}
-				break;
-			case "none":
-				createSidePanel();
-				break;
-		} 
+					break;
+			} 
+		}
 	});
 }
 

@@ -1,4 +1,4 @@
-var option_elements = document.querySelectorAll("input, select");
+var option_elements = document.querySelectorAll("input, select, textarea");
 
 // Saves options to chrome.storage
 function save_options() {
@@ -10,6 +10,9 @@ function save_options() {
 			switch(option_elem.type) {
 				case "checkbox":
 					on_page_options[option_key] = option_elem.checked;
+					break;
+				case "textarea":
+					on_page_options[option_key] = option_elem.value.split("\n");
 					break;
 				case "text":
 				default:
@@ -41,6 +44,9 @@ function load_options() {
 				switch(option_elem.type) {
 					case "checkbox":
 						option_elem.checked = option_val;
+						break;
+					case "textarea":
+						option_elem.value = option_val.join("\n");
 						break;
 					case "text":
 					default:

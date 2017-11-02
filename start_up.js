@@ -12,6 +12,7 @@ function initialise_options() {
 		default_options["cPanel-auto-open-delay"]=0;
 		default_options["minimise-tracking"]="globally";
 		default_options["close-tracking"]="per-site";
+		default_options["blacklist-domains"]=["www.neto.com.au","goto.neto.com.au","developers.neto.com.au"];
 		
 		var def_opt_keys = Object.keys(default_options);
 		
