@@ -46,7 +46,7 @@ function autoOpenCPanel() {
 	chrome.storage.sync.get(["enable-cPanel-auto-open","cPanel-auto-open-delay"], function(stored_options) {
 		//automatically load control panel if one not already open
 		if (stored_options["enable-cPanel-auto-open"]) {
-			if (Date.now()-window.localStorage.getItem("last_cpanel_opened") > stored_options["cPanel-auto-open-delay"] && !/_cpanel/.test(window.location.pathname)) {
+			if (Date.now()-window.localStorage.getItem("last_cpanel_opened") > stored_options["cPanel-auto-open-delay"] && !/_cpanel/.test(window.location.pathname) && !/cgi-bin\/suppliers\/index.cgi/.test(window.location.pathname)) {
 				chrome.runtime.sendMessage({target:"background",title:"auto-open-cpanel",domain:window.location.hostname}, function() {});
 				window.localStorage.setItem("last_cpanel_opened", Date.now());
 			}
@@ -197,7 +197,8 @@ function set_pi_url(id, url, tooltip) {
 	var pi_link = create_element("a",
 		{
 			href:url,
-			innerText:url
+			innerText:url,
+			target:"_target"
 		},{
 			wordBreak:"break-all",
 			color:"#086b90"
