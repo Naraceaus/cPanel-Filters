@@ -222,10 +222,11 @@ function create_dialog_window() {
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-left:not(:hover),#cPanel_checker_dialogue.auto-minimize.snap-top:not(:hover),#cPanel_checker_dialogue.auto-minimize.snap-right:not(:hover),#cPanel_checker_dialogue.auto-minimize.snap-bottom:not(:hover){border-radius: initial !important;}",0);
 	
 	// generic styling (padding, borders colour etc)
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .min-padding {padding: 5px !important;}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .min-vert-padding {padding: 5px 0px !important;}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .min-vert-margin {margin-bottom: 5px}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .minor-heading {background: #558B6E !important; font-size: 16px !important; border-radius:5px 5px 0px 0px !important; padding: 5px 0px !important;}",0);
-	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .basic-text {background: #DDCFAD !important;}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue .basic-text {background: #DDCFAD !important; border-radius:0px 0px 5px 5px !important;}",0);
 	
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue label, #cPanel_checker_dialogue button {cursor:pointer;}",0);
 
@@ -254,7 +255,7 @@ function create_dialog_window() {
 			id: "ch_items_cont"
 		},
 		{
-			width:"400px",
+			//width:"400px",
 			background:"#1599ca",
 			padding:"15px",
 			display:"flex",
@@ -693,7 +694,7 @@ function create_info_panel() {
 			{
 				id:pelinfo.id+"-label",
 				innerText:pelinfo.labelText,
-				className:"min-vert-padding"
+				className:"min-padding"
 			},
 			{
 				width:"35%",
