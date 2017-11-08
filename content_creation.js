@@ -129,6 +129,21 @@ function create_dialog_window() {
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.auto-minimize.snap-top:hover,#cPanel_checker_dialogue.auto-minimize.snap-bottom:hover {height:auto !important;max-height:600px !important;}",0);
 
 	
+	//arrow image for auto minimize
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_right.svg")+");}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-left.auto-minimize #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_left.svg")+");}",0);
+	
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-right #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_left.svg")+");}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-right.auto-minimize #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_right.svg")+");}",0);
+
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_down.svg")+");}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-top.auto-minimize #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_up.svg")+");}",0);
+
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_up.svg")+");}",0);
+	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom.auto-minimize #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_down.svg")+");}",0);
+
+	
+	
     hover_styles.sheet.insertRule(`
 		 #cPanel_checker_dialogue .tooltip {
 			opacity: 1;  
@@ -268,7 +283,11 @@ function create_dialog_window() {
 			height:"100%",	
 			width:"100%",	
 			background:"#E54034",
-			cursor:"pointer"
+			cursor:"pointer",
+			backgroundImage:"url("+chrome.extension.getURL("cross.svg")+")",
+			backgroundSize:"contain",
+			backgroundPosition:"center",
+			backgroundRepeat:"no-repeat"
 		}
 	)
 	
@@ -284,8 +303,12 @@ function create_dialog_window() {
 		{
 			height:"100%",	
 			width:"100%",
-			background:"#F0C808",
-			cursor:"pointer"
+			backgroundColor:"#F0C808",
+			cursor:"pointer",
+			//backgroundImage:"url("+chrome.extension.getURL("arrow_right.svg")+")",
+			backgroundSize:"contain",
+			backgroundRepeat:"space",
+			backgroundPosition:"center"
 		}
 	)
 	min_dialog_btn.addEventListener("click", toggleMinimize);
@@ -302,7 +325,11 @@ function create_dialog_window() {
 			width:"100%",	
 			cursor:"move",
 			zIndex:"1000001",
-			background:"#8e846b"
+			background:"#8e846b",
+			backgroundImage:"url("+chrome.extension.getURL("drag.png")+")",
+			backgroundSize:"contain",
+			backgroundPosition:"center",
+			backgroundRepeat:"no-repeat"
 		}
 	)
 
