@@ -142,8 +142,16 @@ function create_dialog_window() {
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_up.svg")+");}",0);
 	hover_styles.sheet.insertRule("#cPanel_checker_dialogue.snap-bottom.auto-minimize #min_dialog_btn {background-image:url("+chrome.extension.getURL("arrow_full_down.svg")+");}",0);
 
+	// button styling
+	hover_styles.sheet.insertRule("#rem_dialog_btn:active, #min_dialog_btn:active, #drag_dialog_btn.active {box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);}",0);
+	
+	hover_styles.sheet.insertRule("#rem_dialog_btn:hover {background-color: #CC271B !important;}",0);
+	hover_styles.sheet.insertRule("#min_dialog_btn:hover {background-color: #D7AF00 !important;}",0);
+	hover_styles.sheet.insertRule("#drag_dialog_btn:hover {background-color: #756B52 !important;}",0);
 	
 	
+	
+	//styling to make tooltips work+
     hover_styles.sheet.insertRule(`
 		 #cPanel_checker_dialogue .tooltip {
 			opacity: 1;  
@@ -160,7 +168,6 @@ function create_dialog_window() {
 			transition:initial;
 		}
 	`,0);
-	//styling to make tooltips work+
 	hover_styles.sheet.insertRule(`
 		#cPanel_checker_dialogue .tooltip::before {
 			content: attr(data-tip);
@@ -287,7 +294,8 @@ function create_dialog_window() {
 			backgroundImage:"url("+chrome.extension.getURL("cross.svg")+")",
 			backgroundSize:"contain",
 			backgroundPosition:"center",
-			backgroundRepeat:"no-repeat"
+			backgroundRepeat:"no-repeat",
+			border:"solid 1px #8c2019"
 		}
 	)
 	
@@ -308,7 +316,8 @@ function create_dialog_window() {
 			//backgroundImage:"url("+chrome.extension.getURL("arrow_right.svg")+")",
 			backgroundSize:"contain",
 			backgroundRepeat:"space",
-			backgroundPosition:"center"
+			backgroundPosition:"center",
+			border:"solid 1px #987f04"
 		}
 	)
 	min_dialog_btn.addEventListener("click", toggleMinimize);
@@ -329,7 +338,8 @@ function create_dialog_window() {
 			backgroundImage:"url("+chrome.extension.getURL("drag.png")+")",
 			backgroundSize:"contain",
 			backgroundPosition:"center",
-			backgroundRepeat:"no-repeat"
+			backgroundRepeat:"no-repeat",
+			border:"solid 1px #544f41"
 		}
 	)
 
@@ -781,6 +791,7 @@ function dragMainPanel(start_elem) {
 		document.onmouseup = closeDragElement;
 		// call a function whenever the cursor moves:
 		document.onmousemove = elementDrag;
+		start_elem.className+=" active"
 	}
 
 	function elementDrag(e) {
@@ -844,6 +855,8 @@ function dragMainPanel(start_elem) {
 		/* stop moving when mouse button is released:*/
 		document.onmouseup = null;
 		document.onmousemove = null;
+		
+		start_elem.className=start_elem.className.replace(" active","");
 	}
 }
 
