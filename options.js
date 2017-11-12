@@ -35,11 +35,9 @@ function save_options() {
 // Load options from extension onto page
 function load_options() {
 	chrome.storage.sync.get(null, function(stored_options) {
-		console.log();
 		for (var oei = 0; oei < option_elements.length; oei++) {
 			var option_elem = option_elements[oei];
 			var option_val = stored_options[option_elem.id];
-			console.log(option_elem, option_val);
 			if (option_val != null) {
 				switch(option_elem.type) {
 					case "checkbox":

@@ -67,6 +67,10 @@ function process_webstore_response(response) {
 		
 		set_pi_value("default-theme", theme_sel.value);
 		
+		if (cur_active_theme == null || cur_active_theme == "") {
+			cur_active_theme = theme_sel.value;
+		}
+		set_pi_value("active-theme", cur_active_theme);
 		if (get_pi_value("page-type") == "cPanel") {
 			set_pi_value("active-theme", "n.a.");
 		} else {
@@ -76,6 +80,7 @@ function process_webstore_response(response) {
 			for (var toi = 0; toi < theme_opt.length; toi++) {
 				avail_themes.push(theme_opt[toi].value);
 			}
+						
 			var theme_select = create_select(avail_themes, avail_themes, cur_active_theme,
 				{
 					id:"active-theme-selector"
@@ -108,33 +113,48 @@ function get_page_info(is_neto, logged_in) {
 		} else {
 			set_pi_value("page-type","Webstore");
 			set_pi_url("cpanel-link", find_url_in_cpanel(), "If you login to the control panel you'll get a better link");
-			//check body element for page type
-			var page_body = document.querySelector("body[id*='n_'],body[class*='n_']");
-			if (page_body != null) {
-				set_pi_value("page-subtype",page_body.id.replace("n_",""));
-				set_pi_value("active-theme",page_body.className.replace("n_",""));
-				if (logged_in) {
-					switch (get_pi_value("page-subtype")) {
-						case "customer_account":
-							make_ajax_request("/_myacct/edit_account","",logged_in_customer_email);
-							break;
-						case "category":
-						case "product":
-						default:
-							//slice is to remove first "/"
-							make_ajax_request("/_cpanel","tkn=url&_ftr_request_url=^"+window.location.pathname.slice(1)+"&ajax=y",this.find_direct_url_in_cpanel);
-							break;
+			
+			
+			// check http cookie for nview value
+			chrome.runtime.sendMessage({target:"background",title:"get-n-view",url:window.location.href}, function(response) {
+				set_pi_value("active-theme",response.nview);
+				//check body element for page type
+				var page_body = document.querySelector("body[id*='n_'],body[class*='n_']");
+				if (page_body != null) {
+					set_pi_value("page-subtype",page_body.id.replace("n_",""));
+					
+					if (logged_in) {
+						switch (get_pi_value("page-subtype")) {
+							case "customer_account":
+								make_ajax_request("/_myacct/edit_account","",logged_in_customer_email);
+								break;
+							case "category":
+							case "product":
+							default:
+								//slice is to remove first "/"
+								make_ajax_request("/_cpanel","tkn=url&_ftr_request_url=^"+window.location.pathname.slice(1)+"&ajax=y",this.find_direct_url_in_cpanel);
+								break;
+						}
+					} else {
+						set_pi_url("cpanel-link",find_url_in_cpanel(), "If you login to the control panel you'll get a better link");
+						if (response.nview==null || response.nview=="") {
+							set_pi_value("active-theme",page_body.className.replace("n_",""));
+						}
 					}
+					
+					
 				} else {
-					set_pi_url("cpanel-link",find_url_in_cpanel(), "If you login to the control panel you'll get a better link");
-				}
+					set_pi_value("page-type","n.a.");
+					set_pi_value("page-subtype","n.a.");
+					//set_pi_value("active-theme",("n.a."));
+				}				
 				
 				
-			} else {
-				set_pi_value("page-type","n.a.");
-				set_pi_value("page-subtype","n.a.");
-				set_pi_value("active-theme",("n.a."));
-			}
+				
+				
+				
+			});
+
 		}
 	} else {
 		set_pi_value("active-theme","n.a.");

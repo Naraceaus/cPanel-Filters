@@ -35,6 +35,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.target=="background") {
 		process_message(request, sender, sendResponse);
 	}
+	return true;
 });
 
 function process_message(request, sender, sendResponse) {
@@ -45,6 +46,9 @@ function process_message(request, sender, sendResponse) {
 			break;
 		case "auto-open-cpanel":
 			autoOpenCPanel(request.domain, sender.tab);
+			break;
+		case "get-n-view":
+			checkNView(request.url, sendResponse);
 		default:
  }
 }
@@ -54,7 +58,6 @@ function open_tab(url) {
 }
 
 function autoOpenCPanel(domain, sender_tab) {
-	console.log(sender_tab);
 	var new_tab_options = {url:"https://"+domain+"/_cpanel",selected:false};
 	if (sender_tab != null) {
 		new_tab_options.index = sender_tab.index+1;
@@ -67,8 +70,19 @@ function autoOpenCPanel(domain, sender_tab) {
 	});
 }
 
+function checkNView(url, sendResponse) {
+	chrome.cookies.get({url:url,name:"ninfo_view"}, function(cookie) {
+		var nview = null;
+		
+		if (cookie!=null) {
+			var cookie_value_arr = decodeURIComponent(cookie.value).split("|");
+			nview = cookie_value_arr[cookie_value_arr.length-1];
+		}
+		sendResponse({nview:nview});
+	})
+}
+
 chrome.browserAction.onClicked.addListener(function callback(active_tab) {
-	console.log(active_tab);
 	chrome.tabs.sendMessage(active_tab.id, {target:"tab",title:"generate-dialog"}, null, function() {});
 
 });

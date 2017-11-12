@@ -4,8 +4,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 function process_message(request, sender, sendResponse) {
-	console.log("processing message")
-	console.log(request)
 	//interpret modifications
 	switch (request.title) {
 		case "find-page-in-cpanel":
@@ -18,7 +16,6 @@ function process_message(request, sender, sendResponse) {
 //			neto_page(function(){},"page-info");
 //			break;
 		case "generate-dialog":
-			console.log("generate dialog requested")
 			createSidePanel();
 			break;
 		default:
@@ -56,7 +53,6 @@ function check_element_add_filter(pot_elem, start_fil_qs){
 		}
 	} // else check if value exists
 	else if (pot_elem.value!=null) {
-		console.log(pot_elem.getAttribute("name"), pot_elem.value != "", start_fil_qs.get_key(pot_elem.getAttribute("name")), start_fil_qs.get_key(pot_elem.getAttribute("name")) != null);
 		if (pot_elem.value != "") {
 			new_fil_qs.add_key(pot_elem.getAttribute("name"), pot_elem.value);
 		} else if (start_fil_qs.get_key(pot_elem.getAttribute("name")) != null) {
@@ -71,7 +67,6 @@ function update_window_url() {
 }
 
 function auto_filter_setup() {
-	console.log("generateurl");
 	var filter_elements = document.querySelectorAll("[name*='_ftr_'],[name*='_sb_']");	
 	for (var fil_i = 0; fil_i < filter_elements.length; fil_i++) {
 		filter_elements[fil_i].addEventListener('input', function() {update_window_url()});
@@ -320,7 +315,6 @@ function make_ajax_request(path,qry_str,success_func,fail_func,is_get,input) {
 			input.unshift(ajax_request);
 			if (ajax_request.status == 200) {
 				if (typeof(success_func) == "function") {
-					console.log(input);
 					success_func.apply(this, input);
 				}
 			}
@@ -875,8 +869,6 @@ function check_eBay_process(ajax_response, reset = false) {
 		}
 	}
 	if (stuck_ebay_proc_ids.length > 0) {
-		console.log("following eBay processes are probably stuck: ");
-		console.log(stuck_ebay_proc_ids);		
 		create_stuck_ebay_popup();
 	}
 	
@@ -1099,7 +1091,6 @@ function initialise() {
 	chrome.storage.sync.get(["close-tracking","helper-closed","blacklist-domains"], function(stored_options) {
 		var set_to_create = false;
 		if (!(stored_options["blacklist-domains"].includes(window.location.hostname))) {
-			console.log(window.location.hostname + " not in " + stored_options["blacklist-domains"])
 			switch(stored_options["close-tracking"]) {
 				case "globally":
 					if (!stored_options["helper-closed"]) {
@@ -1120,7 +1111,6 @@ function initialise() {
 }
 
 function createSidePanel() {
-	console.log("make side panel?");
 	if (document.querySelector("#cPanel_checker_dialogue")==null) {
 		create_dialog_window();
 		create_purge_panel();

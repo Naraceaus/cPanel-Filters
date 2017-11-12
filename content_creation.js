@@ -11,12 +11,6 @@ function create_element(type, attributes, style) {
 		attributes={};
 	}
 	
-	if (style.margin!=null) {
-		console.log(style.margin);
-		console.log(style);
-		console.log("boop");
-	}
-	
 	//set default values if not specified (helps prevent in page styling affecting the popup
 	var def_styles = {
 		fontSize:"14px",
