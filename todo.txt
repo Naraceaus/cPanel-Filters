@@ -1,4 +1,3 @@
 Page directions generator
 move eBay search to context panels
-taskbar icons
 select all button bottom of page

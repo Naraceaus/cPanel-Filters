@@ -452,7 +452,7 @@ function reload_new_nview(new_theme) {
 	var new_url="";
 	if (current_url.includes("?")) {
 		if (current_url.includes("nview")) {
-			new_url = current_url.replace(/nview=[a-zA-Z-_]*/,"nview=" + new_theme);
+			new_url = current_url.replace(/nview=[a-zA-Z-_\d]*/,"nview=" + new_theme);
 		} else {
 			new_url = current_url + "&nview=" + new_theme;
 		}
