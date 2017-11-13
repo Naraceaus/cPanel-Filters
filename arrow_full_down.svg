@@ -10,10 +10,10 @@
    version="1.1"
    x="0px"
    y="0px"
-   width="32px"
+   width="96px"
    height="32px"
-   viewBox="0 0 32 32"
-   enable-background="new 0 0 32 32"
+   viewBox="0 0 96 32"
+   enable-background="new 0 0 96 32"
    xml:space="preserve"
    id="svg2"
    inkscape:version="0.48.4 r9939"
@@ -56,4 +56,8 @@
        id="rect6" /></g><path
      style=""
      d="m 22,2 -12.001,0 0,14 -8,0 14,14 L 29.998,16 22,16 z"
-     id="polygon9" /></svg>
+     id="polygon9" />
+	
+	<text x="32" y="20" font-family="arial" font-size="14px">Auto Hide</text>
+	
+	</svg>
