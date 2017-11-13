@@ -3,7 +3,7 @@
 
   "name": "cPanel Helper",
   "description": "A series of small functions that make using the Neto cPanel simpler",
-  "version": "5.2",
+  "version": "5.3",
 	"options_ui":{
 		"page":"options.html",
 		"chrome_style": true
