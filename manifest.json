@@ -1,0 +1,84 @@
+{
+
+  "description": "A series of small functions that make using the Neto cPanel simpler.",
+  "manifest_version": 2,
+  "name": "Neto Site Helper",
+  "version": "6.0",
+  "homepage_url": "https://github.com/Naraceaus/cPanel-Filters",
+  "icons": {
+    "256": "icons/icon.png"
+  },
+  
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
+
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["storage.js","pingbackground.js"]
+    },
+	{
+      "matches": ["*://*/_cpanel/order*"],
+      "js": ["cPanel/markorderlinesforshipping.js"]	
+	},
+	{
+      "matches": ["*://*/_cpanel/ship"],
+      "js": ["cPanel/shippingmatrix.js"]	
+	},
+	{
+      "matches": ["*://*/_cpanel/shippinggroup*"],
+      "js": ["cPanel/shippingmethods.js"]	
+	},
+	{
+      "matches": ["*://*/_cpanel/ship_carrier/view*"],
+      "js": ["cPanel/shippinglabels.js"]	
+	},
+	{
+      "matches": ["*://*/_cpanel/order*"],
+      "js": ["cPanel/shippingorder.js"]
+	},
+	{
+		"matches": [
+			"*://*/_cpanel/products",
+			"*://*/_cpanel/products?*",
+			"*://*/_cpanel/order",
+			"*://*/_cpanel/order?*",
+			"*://*/_cpanel/orders",
+			"*://*/_cpanel/orders?*",
+			"*://*/_cpanel/stocktake",
+			"*://*/_cpanel/stockadj",
+			"*://*/_cpanel/customer",
+			"*://*/_cpanel/customer?*",
+			"*://*/_cpanel/shippinggroup",
+			"*://*/_cpanel/shippinggroup?*",
+			"*://*/_cpanel/shippingcostmgr",
+			"*://*/_cpanel/shippingcostmgr?*",
+			"*://*/_cpanel/manifest",
+			"*://*/_cpanel/manifest?*",
+			"*://*/_cpanel/ship_carrier",
+			"*://*/_cpanel/ship_carrier?*",
+			"*://*/_cpanel/vouchers",
+			"*://*/_cpanel/vouchers?*",
+			"*://*/_cpanel/contents",
+			"*://*/_cpanel/contents?*",
+			"*://*/_cpanel/contentzones",
+			"*://*/_cpanel/contentzones?*",
+			"*://*/_cpanel/adw",
+			"*://*/_cpanel/adw?*"
+		],
+		"js": ["cPanel/urlfiltergeneration.js"]
+	}
+  ],
+  "browser_action": {
+	"default_popup":"popup/ui.html"
+  },
+  "background": {
+	"page": "background/background-page.html"
+  },
+  "permissions": [
+	"storage",
+	"tabs",
+	"*://*/*"
+  ]
+
+}
