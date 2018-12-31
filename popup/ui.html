@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="popup.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:400,500,600" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+    <div id="extension-wrapper">
+        <div class="top">
+            <button class="purge bold" v-bind:disabled="!sitedata.loggedin && !purgingcache" v-on:click="purgeCache(false)">Purge</button>
+            <button class="heavy-purge bold" v-bind:disabled="!sitedata.loggedin && !purgingcache" v-on:click="purgeCache(true)">Heavily Purge</button>
+        </div>
+        <div class="logged-in-wrapper text-center">
+            <span>{{sitedata.status}}</span><button class="circle-btn" v-on:click="forceRefresh">&#8635 </button>
+        </div>
+        <div class="mid">
+            <section>
+                <div class="left-text">
+                    <strong>Current Page in cPanel</strong><br/>
+                    <p class="subtitle">{{localpage}}</p>
+                </div>
+                <div v-if="localpage!='LOADING' && localpage!='NO RESULTS'" class="button-right-wrapper">
+                    <div class="circle-btn">
+                        <button class="circle-btn" v-on:click="openLink(localpage)">
+							🡢
+                        </button>
+                    </div>
+                </div>
+            </section>
+            <section class="theme-section">
+                <div class="left-text">
+                    <strong>Live Theme:</strong><br/>
+                </div>
+                <div class="button-right-wrapper text-right">
+                        <p>{{sitedata.livetheme}}</p>
+                </div>
+            </section>  
+            <section class="previewing-wrapper">
+                    <div class="previewing-left left-text">
+                        <strong>Previewing:</strong>
+                    </div>
+                    <div class="previewing-right">
+                        <select name="theme-select" v-model="preview" v-on:change="changeTheme">
+                            <option v-for="(theme, index) in sitedata.themes" v-bind:value="theme">{{theme}}</option>
+                        </select> 
+                    </div>
+            </section>
+			
+			
+			<section v-if="orderpage">
+                <div class="left-text">
+                    <strong>Mark Orderlines For Shipping</strong><br/>
+                </div>
+                <div  class="button-right-wrapper">
+                    <div class="circle-btn">
+                        <button class="circle-btn" v-on:click="markOrderlinesForShipping()">
+							🡢
+                        </button>
+                    </div>
+                </div>
+            </section>
+			
+        </div>
+    </div>
+</body>
+<footer>
+	<script src="vue.js"></script>
+	<script src="../storage.js"></script>
+	<script src="ui.js"></script>	
+</footer>
+</html>

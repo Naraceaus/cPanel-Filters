@@ -1,3 +1,0 @@
-Page directions generator
-move eBay search to context panels
-select all button bottom of page

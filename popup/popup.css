@@ -1,0 +1,106 @@
+* {
+	font-family: 'Fira Sans', sans-serif;
+	font-weight: 400;
+	font-size: 14px;
+	color: #333;
+} 
+
+.subtitle {
+	font-size: 85%;
+	opacity: 0.8;
+	font-weight: 400;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+strong, .bold {
+	font-weight: 600;
+}
+
+body {
+	background-color: #f4f4f4;
+}
+
+p {
+	margin: 0;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.text-right {
+	text-align: right;
+}
+
+#extension-wrapper {
+	width: 400px;
+	margin: 0 auto;
+	background-color: #fff;
+}
+
+#extension-wrapper .top {
+	display: flex; 
+	align-items: center;
+	justify-content: center;
+}
+
+#extension-wrapper .top button {
+	margin: 12px 5px;
+	padding: 10px 18px;
+	border-radius: 30px;
+	font-size: 16px;
+	border: 0;
+	box-shadow: none;
+	cursor: pointer;
+}
+
+button.purge {
+	background-color: #45C0EF;
+	color: #fff;
+}
+
+#extension-wrapper button.heavy-purge {
+	background-color: #fff;
+	border: 1px solid #DFDFDF;
+}
+
+.logged-in-wrapper {
+	background-color: #ededed;
+	text-transform: uppercase;
+	padding: 6px;
+}
+
+#extension-wrapper section {
+	padding: 12px 12px;
+	border-bottom: 1px solid #ededed;
+	display: flex;
+	align-items: center;
+}
+
+.left-text {
+	width: 90%;
+}
+
+.theme-section .left-text {
+	width: 60%;
+}
+
+.theme-section .button-right-wrapper {
+	width: 100%;
+}
+
+.circle-btn {
+	border-radius: 50%;
+	height: 35px;
+	width: 35px;
+	background-color: #fff;
+	border: 0.5px solid #e0e0e0;
+	color:  #45C0EF; 
+	font-size: 18px;
+	cursor: pointer;
+}
+
+.previewing-wrapper {
+	background-color: #ededed;
+}
