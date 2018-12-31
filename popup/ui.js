@@ -67,9 +67,9 @@ var helper_ui = new Vue({
 			var self = this;
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
 				sendMessageToID(tabs[0].id, {type: "check_nview"}, function(response) {
-					console.log('content script responded');
-					console.log(response);
-					self.preview = response.preview;
+					if (typeof(response) != "undefined") {
+						self.preview = response.preview;
+					}
 				});
 			})
 		},
@@ -77,9 +77,9 @@ var helper_ui = new Vue({
 			var self = this;
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
 				sendMessageToID(tabs[0].id, {type: "check_order_page"}, function(response) {
-					console.log('content script responded');
-					console.log(response);
-					self.orderpage = response.orderpage;
+					if (typeof(response) != "undefined") {
+						self.orderpage = response.orderpage;
+					}
 				});
 			})			
 		},
