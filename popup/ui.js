@@ -12,7 +12,8 @@ var helper_ui = new Vue({
 		localpage: 'LOADING',
 		purgingcache: false,
 		preview: '',
-		orderpage: false
+		orderpage: false,
+		parentpage: false
 	},
 	methods: {
 		openLink: function(url) {
@@ -87,11 +88,28 @@ var helper_ui = new Vue({
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
 				sendMessageToID(tabs[0].id, {type: "mark_orderlines_for_shipping"});
 			});			
+		},
+		checkParentPage: function() {
+			var self = this;
+			
+			queryTabs({active: true, currentWindow: true}, function(tabs) {
+				sendMessageToID(tabs[0].id, {type: "check_parent_page"}, function(response) {
+					if (typeof(response) != "undefined") {
+						self.parentpage = response.parentpage;
+					}
+				});
+			})			
+		},
+		displayHiddenParentFields: function() {
+			queryTabs({active: true, currentWindow: true}, function(tabs) {
+				sendMessageToID(tabs[0].id, {type: "display_hidden_parent_fields"});
+			});	
 		}
 	},
 	created: function() {
 		this.checkNView();
 		this.checkOrderPage();
+		this.checkParentPage();
 	}
 })
 /*

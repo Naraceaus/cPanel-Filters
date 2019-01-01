@@ -63,6 +63,18 @@
                     </div>
                 </div>
             </section>
+			<section v-if="parentpage">
+                <div class="left-text">
+                    <strong>Display Hidden Parent Fields</strong><br/>
+                </div>
+                <div  class="button-right-wrapper">
+                    <div class="circle-btn">
+                        <button class="circle-btn" v-on:click="displayHiddenParentFields()">
+							🡢
+                        </button>
+                    </div>
+                </div>
+            </section>
 			
         </div>
     </div>

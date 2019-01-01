@@ -25,6 +25,11 @@ function listenForNViewRequests(request, sender, sendResponse) {
 		sendResponse({orderpage: orderpage});
 	} else if(request.type == "mark_orderlines_for_shipping") {
 		mark_orderlines_for_shipping();
+	} else 	if (request.type == "check_parent_page") {
+		var parentpage = window.location.pathname == "/_cpanel/products/view" && document.querySelector("span[title='Parent Product']") != null;
+		sendResponse({parentpage: parentpage});
+	} else if(request.type == "display_hidden_parent_fields") {
+		display_parent_fields();
 	}
 }
 
@@ -46,12 +51,14 @@ function mark_orderlines_for_shipping() {
 		
 		orderlines_shipped++;
 	}
+}
+
+function display_parent_fields() {
+	var hidden_fields = document.getElementsByClassName("cp-hide-inparent");
+	var num_hidden_fields = hidden_fields.length;
 	
-	if (orderlines_shipped > 0) {
-		display_text = "Marked "+orderlines_shipped+" orderlines for shipping";
-	} else {
-		display_text = "There are no orderlines to mark for shipping";;
+	
+	for (var hfi = 0; hfi < hidden_fields.length;) {
+		hidden_fields[0].className = hidden_fields[0].className.replace("cp-hide-inparent","");
 	}
-	
-	document.querySelector("#ship_orderlines .description").innerText = display_text;
 }
