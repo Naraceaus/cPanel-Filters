@@ -1,3 +1,4 @@
+function prependRatesIDs() {
 	var ship_ser_opts = document.querySelectorAll("[name*='lnk_shm'] > option");
 	for (var ssoi = 0; ssoi < ship_ser_opts.length; ssoi++) {
 		var cur_ser_opt = ship_ser_opts[ssoi];
@@ -7,3 +8,10 @@
 			cur_ser_opt.innerText = ser_id + " - " + ser_name;
 		}
 	}
+}
+
+prependRatesIDs();
+
+if (document.querySelector("[onclick='addShm()']") != null) {
+	document.querySelector("[onclick='addShm()']").addEventListener("click",function(){prependRatesIDs()});
+}
