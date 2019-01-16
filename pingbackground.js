@@ -25,6 +25,8 @@ function listenForNViewRequests(request, sender, sendResponse) {
 		sendResponse({orderpage: orderpage});
 	} else if(request.type == "mark_orderlines_for_shipping") {
 		mark_orderlines_for_shipping();
+	} else if(request.type == "toggle_shipping_methods") {
+		toggle_shipping_methods(request.state);
 	} else 	if (request.type == "check_parent_page") {
 		var parentpage = window.location.pathname == "/_cpanel/products/view" && document.querySelector("span[title='Parent Product']") != null;
 		sendResponse({parentpage: parentpage});
@@ -51,6 +53,14 @@ function mark_orderlines_for_shipping() {
 		
 		orderlines_shipped++;
 	}
+}
+
+function toggle_shipping_methods(state) {
+	var hide_class="";
+	if (state=='hide') {
+		hide_class="hidden";
+	}
+	[...document.querySelectorAll(".shm-method-info-pl span")].filter(a => a.textContent == "- Inactive").map(a => a.closest('tr')).forEach(a => a.className = hide_class);
 }
 
 function display_parent_fields() {

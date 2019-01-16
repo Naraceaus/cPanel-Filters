@@ -13,6 +13,7 @@ var helper_ui = new Vue({
 		purgingcache: false,
 		preview: '',
 		orderpage: false,
+		matrixpage: false,
 		parentpage: false
 	},
 	methods: {
@@ -84,9 +85,20 @@ var helper_ui = new Vue({
 				});
 			})			
 		},
+		checkMatrixPage: function() {
+			var self = this;
+			queryTabs({active: true, currentWindow: true, url:"*://*/_cpanel/ship"}, function(tabs) {
+				self.matrixpage = tabs.length > 0;
+			})			
+		},
 		markOrderlinesForShipping: function() {
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
 				sendMessageToID(tabs[0].id, {type: "mark_orderlines_for_shipping"});
+			});			
+		},
+		toggleShippingMethods: function(state) {
+			queryTabs({active: true, currentWindow: true}, function(tabs) {
+				sendMessageToID(tabs[0].id, {type: "toggle_shipping_methods", state: state});
 			});			
 		},
 		checkParentPage: function() {
@@ -109,6 +121,7 @@ var helper_ui = new Vue({
 	created: function() {
 		this.checkNView();
 		this.checkOrderPage();
+		this.checkMatrixPage();
 		this.checkParentPage();
 	}
 })

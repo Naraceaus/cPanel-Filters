@@ -26,7 +26,7 @@
                 <div v-if="localpage!='LOADING' && localpage!='NO RESULTS'" class="button-right-wrapper">
                     <div class="circle-btn">
                         <button class="circle-btn" v-on:click="openLink(localpage)">
-							🡢
+							&#129122;
                         </button>
                     </div>
                 </div>
@@ -58,7 +58,31 @@
                 <div  class="button-right-wrapper">
                     <div class="circle-btn">
                         <button class="circle-btn" v-on:click="markOrderlinesForShipping()">
-							🡢
+							&#129122;
+                        </button>
+                    </div>
+                </div>
+            </section>
+			<section v-if="matrixpage">
+                <div class="left-text">
+                    <strong>Hide Inactive Methods </strong><br/>
+                </div>
+                <div  class="button-right-wrapper">
+                    <div class="circle-btn">
+                        <button class="circle-btn" v-on:click="toggleShippingMethods('hide')">
+							&#9745;
+                        </button>
+                    </div>
+                </div>
+            </section>
+			<section v-if="matrixpage">
+                <div class="left-text">
+                    <strong>Show Inactive Methods </strong><br/>
+                </div>
+                <div  class="button-right-wrapper">
+                    <div class="circle-btn">
+                        <button class="circle-btn" v-on:click="toggleShippingMethods('show')">
+							&#9744;
                         </button>
                     </div>
                 </div>
@@ -70,7 +94,7 @@
                 <div  class="button-right-wrapper">
                     <div class="circle-btn">
                         <button class="circle-btn" v-on:click="displayHiddenParentFields()">
-							🡢
+							&#128065;
                         </button>
                     </div>
                 </div>
