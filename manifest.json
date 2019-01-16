@@ -3,7 +3,7 @@
   "description": "A series of small functions that make using the Neto cPanel simpler.",
   "manifest_version": 2,
   "name": "Neto Site Helper",
-  "version": "6.1",
+  "version": "6.2",
   "homepage_url": "https://github.com/Naraceaus/cPanel-Filters",
   "icons": {
     "256": "icons/icon.png"
