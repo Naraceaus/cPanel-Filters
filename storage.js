@@ -131,49 +131,6 @@ function extractQueryString(full_url) {
 	return full_url.replace(/.*?(\?|$)/,"")
 }
 
-
-
-
-function make_ajax_request(url,qry_str,success_func,fail_func,is_get,input) {
-	if (input == null || !(input instanceof Array)) {
-		input = [];
-	}
-	var ajax_request = new XMLHttpRequest();
-	
-	ajax_request.onreadystatechange=function() {
-		if (ajax_request.readyState == XMLHttpRequest.DONE ) {
-			if (ajax_request.response != null) {
-				// remove script tags
-				ajax_request.processed_response = ajax_request.response.replace(/[\r\n]*<script[\s\S]*?<\/script>[\r\n]*/g,"")
-				//remove style tags
-				ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<style[\s\S]*?<\/style>[\r\n]*/g,"");
-				//remove image tags
-				ajax_request.processed_response = ajax_request.processed_response.replace(/[\r\n]*<img[\s\S]*?>[\r\n]*/g,"");
-			}
-			input.unshift(ajax_request);
-			if (ajax_request.status == 200) {
-				if (typeof(success_func) == "function") {
-					success_func.apply(this, input);
-				}
-			}
-			else {
-				if (typeof(fail_func) == "function") {
-					fail_func.apply(this, input);
-				}
-			}
-		}
-	}
-
-	var	post_get_value = "POST";
-	if (is_get==true) {
-		post_get_value = "GET";
-	}
-
-	ajax_request.open(post_get_value,"https://"+url, true);
-	ajax_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-	ajax_request.send(qry_str);
-}
-
 function create_netosd_data(data, sp) {
 	if (!sp) {
 		sp = '|';
@@ -285,33 +242,69 @@ function parse_netosd_data_rc(data, vds, sp) {
 
 /**
  * Returns a Promise with a Document or string from the given URL with query parameters.
- * Promise returns a blank Document or string if the fetch failed.
+ * Promise returns an object with a text and dom attribute if needDom is true.
  * @param {string} url 				- The URL to get the Document from 
  * @param {object} queries 			- An Object of key-value pairs of query parameters. Defaults to an empty object
- * @param {boolean} needText 		- Whether text is required instead of a Document. Defaults to false
+ * @param {boolean} needDom 		- Whether text is required instead of a Document. Defaults to false
  */
-function getPage(url, queries={}, needText=false) {
+async function getPage(url, queries={}, needDom=false) {
 	return new Promise((resolve, reject) => {
-		let uri = `${url}?`
+		let uri = `https://${url}?`
 		Object.entries(queries).forEach(pair => {
 			uri = `${uri}${pair[0]}=${pair[1]}&`
 		})
-		console.log(`my URI: ${uri}`)
 		fetch(uri)
 			.then(
 				response => response.text()
 			)
 			.then(
-				text => {
-					let parser = new DOMParser()
-					needText ? resolve(text) : resolve(parser.parseFromString(text))
+				body => {
+					let result = {text: body}
+					if (needDom) {
+						let parser = new DOMParser()
+						result.dom = parser.parseFromString(body, "text/html")
+					}
+					resolve(result)
 				}
 			)
 			.catch(
-				error => {
-					let parser = new DOMParser()
-					needText ? reject('') : reject(parser.parseFromString(''))
+				err => {
+					let result = {text: ""}
+					if (needDom) {
+						let parser = new DOMParser()
+						result.dom = parser.parseFromString("", "text/html")
+					}
+					reject(result)
 				}
+			)
+	})
+}
+
+/**
+ * Returns a Promise with a Document or string from the given URL with query parameters.
+ * Promise returns text result
+ * @param {string} url 				- The URL to get the Document from 
+ * @param {object} parameters 		- An Object of key-value pairs of query parameters. Defaults to an empty object
+ */
+async function postPage(url, parameters={}) {
+	return new Promise((resolve, reject) => {
+		let uri = `https://${url}`
+		let opts = {
+			method: "POST",
+			body: JSON.stringify(parameters),
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded"
+			}
+		}
+		fetch(uri, opts)
+			.then(
+				response => response.text()
+			)
+			.then(
+				text => resolve(text)
+			)
+			.catch(
+				text => reject('')
 			)
 	})
 }

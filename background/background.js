@@ -57,11 +57,10 @@ function analyseSite(domain, path, siteData) {
 	function checkIsNeto() {
 		let url = `${domain}/_cpanel`;
 		console.log('checking for neto')
-		getPage(url, {'ajax': 'y'}, true)
+		getPage(url, {'ajax': 'y'})
 			.then(
-				text => {
-					console.log(`here is some data ${text}`)
-					isNetoResult(text);
+				page => {
+					isNetoResult(page.text);
 				}
 			)
 	}
@@ -71,18 +70,18 @@ function analyseSite(domain, path, siteData) {
 	 * @param {string} text - A string containing the result of getting a cpanel page 
 	 */
 	async function isNetoResult(text) {
-		if (text === '' || text.startsWith("NSD1;")) {
-			siteData.status = "NOT A NETO SITE";
-		} else {
+		if (!(text === "") && text.startsWith("NSD1;")) {
 			siteData.status = "CHECKING LOGIN";
 			isLoggedInResult(text);
+		} else {
+			siteData.status = "NOT A NETO SITE";
 		}
 		storeData(domain,siteData);
 	}
-	
+
 	/**
 	 * Determines if you're logged into the current Neto site and stores the result
-	 * @param {string} text 
+	 * @param {string} text - 
 	 */
 	async function isLoggedInResult(text) {
 		var response = parse_netosd_data(text)
@@ -92,37 +91,35 @@ function analyseSite(domain, path, siteData) {
 		} else if (response.new_csrf_token != null) {
 			siteData.status = "LOGGED IN";
 			siteData.loggedin = true;
-			findPageIncPanel();
+			findPageInCPanel();
 			checkTheme();
 		} else {
 			siteData.status = "WOOPS SOMETHING BROKE";
 		}
-		storeData(domain,siteDdata);			
+		storeData(domain,siteData);			
 	}
 	
 	/**
 	 * Finds the corresponding page in the control page for this webstore page and stores the result
 	 */
 	async function findPageInCPanel() {
-		let url = `${domain}/_cpanel`
+		let url = `${domain}/_cpanel/url`
 		let queries = {
-			"tkn": "url",
-			"_ftr_request_url": `^${truncated_path}`,
-			"ajax": "y"
+			"_ftr_request_url": `^${truncated_path}`
 		}
 		let selector = "#ajax-content-pl table tbody tr:first-of-type td:nth-of-type(2) a"
-		let storedDomain = `${domain}|${truncatedPath}`
-		getPage(url,queries)
+		let storedDomain = `${domain}|${truncated_path}`
+		getPage(url, queries, true)
 			.then(
-				doc => {
-					let link = doc.querySelector(selector);
+				result => {
+					let link = result.dom.querySelector(selector);
 					link
 						? storeData(storedDomain, link.getAttribute('href'))
 						: storeData(storedDomain, "NO RESULTS")
 				}
 			)
 			.catch(
-				doc => {
+				result => {
 					storeData(storedDomain, "NO RESULTS");
 				}
 			)
@@ -132,27 +129,30 @@ function analyseSite(domain, path, siteData) {
 	 * Checks the installed themes and finds the active theme and stores both results
 	 */
 	async function checkTheme() {
-		let url = `${domain}/_cpanel/setup_wizard/webshopconfig`
-		getPage(url)
+		let url = `${domain}/_cpanel/setup_wizard`
+		let queries = {
+			"id": "webshopconfig"
+		}
+		getPage(url, queries, true)
 			.then(
-				doc => {
-					let options = [...doc.querySelector("select[name='cfgval0']").children]
+				result => {
+					let options = [...result.dom.querySelector("select[name='cfgval0']").children]
 					let themes = []
-					let liveTheme = ""
+					let livetheme = ""
 					options.forEach(option => {
 						themes.push(option.value)
 						option.selected
-							? liveTheme = option.value
+							? livetheme = option.value
 							: null
 					})
-					siteData.liveTheme = liveTheme
+					siteData.livetheme = livetheme
 					siteData.themes = themes
 					storeData(domain, siteData)
 				}
 			)
 			.catch(
-				doc => {
-					siteData.liveTheme = "N.A"
+				result => {
+					siteData.livetheme = "N.A"
 					siteData.themes = ["N.A"]
 					storeData(domain, siteData)
 				}
@@ -160,50 +160,63 @@ function analyseSite(domain, path, siteData) {
 		}
 }
 /**
- * TODO - add description for this function 
- * @param {*} message 
- * @param {*} send_response 
+ * 
+ * @param {Message} message 		- 
+ * @param {function} send_response  - 
  */
 function purgeCache(message, send_response) {
 	// request css config to chcek current value
-	make_ajax_request(message.loc.domain+"/_cpanel/config/view?id=NETO_CSS_VERSION&mod=main","",readCSSValue,null,true);
+	let url = `${message.loc.domain}/_cpanel/config/view`
+	let queries = {
+		"id": "NETO_CSS_VERSION",
+		"mod": "main"
+	}
+	getPage(url, queries, true)
+		.then(
+			result => readCSSValue(result)
+		)
 	
-	function readCSSValue(response) {
-		var css_page = response.processed_response;
-		var res_cont = document.createElement("div");
-		res_cont.innerHTML = css_page;
-		
-		
-		var purge_cache_csrf_token = response.responseText.replace(/[\s\S]*csrfTokenSystemRefresh = '/,"").replace(/';[\s\S]*/,"");
-		
-		testelem = res_cont;
+	async function readCSSValue(response) {
+		let purge_cache_csrf_token = response.text.replace(/[\s\S]*csrfTokenSystemRefresh = '/,"").replace(/';[\s\S]*/,"");
+
 		if (message.heavy) {
-			var new_css_num = parseInt(res_cont.querySelector("[name='value']").value)+1;
-			var update_qry_str = "csrf_token="+res_cont.querySelector("[name='csrf_token']").value+
-				"&item=config&page=view&action=edit&mod=main&id=NETO_CSS_VERSION"+
-				"&value="+new_css_num;
+			var newCSSVersion = parseInt(response.dom.querySelector("[name='value']").value) + 1;
+			let token = response.dom.querySelector("[name='csrf_token']").value;
+			var body = {
+				csrf_token: token,
+				item: 'config',
+				page: 'view',
+				action: 'edit',
+				mod: 'main',
+				id: 'NETO_CSS_VERSION',
+				value: newCSSVersion
+			}
 			// update css value with incremented amount
-			make_ajax_request(message.loc.domain+"/_cpanel/config/view",update_qry_str,function(response) {
-				triggerPurgeCache(purge_cache_csrf_token) 			
-			});
+			postPage(url, body)
+				.then(
+					text => triggerPurgeCache(purge_cache_csrf_token)			
+				)
 		} else {
 			triggerPurgeCache(purge_cache_csrf_token);
 		}
 	}
 	
-	function triggerPurgeCache(csrf_token) {
-		var update_qry_str = "csrf_token="+csrf_token+
-			"&ajaxfn=system_refresh&ajax=y";
-		// update css value with incremented amount
-		make_ajax_request(message.loc.domain+"/_cpanel",update_qry_str,function(response) {
-			//TODO refresh purgecached tab
-			if (typeof(browser) == 'undefined') {
-				chrome.tabs.reload(message.loc.id);
-			} else {
-				browser.tabs.reload(message.loc.id);
-			}
-			// TODO try cacth arouynd send_response in case popup is closed before purge cache finishes
-			send_response({'boop':'adoop'});
-		});
+	async function triggerPurgeCache(csrf_token) {
+		let body = {
+			csrf_token: csrf_token,
+			ajaxfn: 'system_refresh',
+			ajax: 'y'
+		}
+		postPage(url, body)
+			.then(
+				text => {
+					if (typeof(browser) == 'undefined') {
+						chrome.tabs.reload(message.loc.id);
+					} else {
+						browser.tabs.reload(message.loc.id);
+					}
+					send_response({'boop':'adoop'});
+				}
+			)
 	}
 }

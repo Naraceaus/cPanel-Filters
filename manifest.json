@@ -76,9 +76,10 @@
 	"page": "background/background-page.html"
   },
   "permissions": [
+	"http://myapp.appspot.com/*",
+  "http://localhost/*",
 	"storage",
 	"tabs",
 	"*://*/*"
   ]
-
 }
