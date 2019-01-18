@@ -109,10 +109,11 @@ function analyseSite(domain, path, siteData) {
 		}
 		let selector = "#ajax-content-pl table tbody tr:first-of-type td:nth-of-type(2) a"
 		let storedDomain = `${domain}|${truncated_path}`
-		getPage(url, queries, true)
+		getPage(url, queries)
 			.then(
-				result => {
-					let link = result.dom.querySelector(selector);
+				text => {
+					let parser = new DOMParser()
+					let link = parser.parse(text).querySelector(selector);
 					link
 						? storeData(storedDomain, link.getAttribute('href'))
 						: storeData(storedDomain, "NO RESULTS")
@@ -133,10 +134,11 @@ function analyseSite(domain, path, siteData) {
 		let queries = {
 			"id": "webshopconfig"
 		}
-		getPage(url, queries, true)
+		getPage(url, queries)
 			.then(
 				result => {
-					let options = [...result.dom.querySelector("select[name='cfgval0']").children]
+					let parser = new DOMParser()
+					let options = [...parser.parse(result).querySelector("select[name='cfgval0']").children]
 					let themes = []
 					let livetheme = ""
 					options.forEach(option => {
@@ -171,17 +173,19 @@ function purgeCache(message, send_response) {
 		"id": "NETO_CSS_VERSION",
 		"mod": "main"
 	}
-	getPage(url, queries, true)
+	getPage(url, queries)
 		.then(
-			result => readCSSValue(result)
+			text => readCSSValue(text)
 		)
 	
 	async function readCSSValue(response) {
-		let purge_cache_csrf_token = response.text.replace(/[\s\S]*csrfTokenSystemRefresh = '/,"").replace(/';[\s\S]*/,"");
+		let purge_cache_csrf_token = response.replace(/[\s\S]*csrfTokenSystemRefresh = '/,"").replace(/';[\s\S]*/,"");
 
 		if (message.heavy) {
-			var newCSSVersion = parseInt(response.dom.querySelector("[name='value']").value) + 1;
-			let token = response.dom.querySelector("[name='csrf_token']").value;
+			let parser = new DOMParser()
+			let doc = parser.parse(response)
+			var newCSSVersion = parseInt(doc.querySelector("[name='value']").value) + 1;
+			let token = doc.querySelector("[name='csrf_token']").value;
 			var body = {
 				csrf_token: token,
 				item: 'config',
@@ -191,7 +195,6 @@ function purgeCache(message, send_response) {
 				id: 'NETO_CSS_VERSION',
 				value: newCSSVersion
 			}
-			// update css value with incremented amount
 			postPage(url, body)
 				.then(
 					text => triggerPurgeCache(purge_cache_csrf_token)			

@@ -245,7 +245,6 @@ function parse_netosd_data_rc(data, vds, sp) {
  * Promise returns an object with a text and dom attribute if needDom is true.
  * @param {string} url 				- The URL to get the Document from 
  * @param {object} queries 			- An Object of key-value pairs of query parameters. Defaults to an empty object
- * @param {boolean} needDom 		- Whether text is required instead of a Document. Defaults to false
  */
 async function getPage(url, queries={}, needDom=false) {
 	return new Promise((resolve, reject) => {
@@ -258,24 +257,10 @@ async function getPage(url, queries={}, needDom=false) {
 				response => response.text()
 			)
 			.then(
-				body => {
-					let result = {text: body}
-					if (needDom) {
-						let parser = new DOMParser()
-						result.dom = parser.parseFromString(body, "text/html")
-					}
-					resolve(result)
-				}
+				body =>resolve(body)
 			)
 			.catch(
-				err => {
-					let result = {text: ""}
-					if (needDom) {
-						let parser = new DOMParser()
-						result.dom = parser.parseFromString("", "text/html")
-					}
-					reject(result)
-				}
+				err => reject('')
 			)
 	})
 }
