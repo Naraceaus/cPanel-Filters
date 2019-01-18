@@ -87,10 +87,10 @@ function getTabLocation(callback) {
 
 	
 	function processTabLocation(tabs) {
-		console.log('procesing tab location');
-		console.log(tabs);
+		
+		
 		if (tabs.length > 0) {
-			console.log(tabs[0].url);
+			
 			var loc = {
 				id: tabs[0].id,
 				url: tabs[0].url,
@@ -281,4 +281,37 @@ function parse_netosd_data_rc(data, vds, sp) {
 		}
 	}
 	return [data, kvdata];
+}
+
+/**
+ * Returns a Promise with a Document or string from the given URL with query parameters.
+ * Promise returns a blank Document or string if the fetch failed.
+ * @param {string} url 				- The URL to get the Document from 
+ * @param {object} queries 			- An Object of key-value pairs of query parameters. Defaults to an empty object
+ * @param {boolean} needText 		- Whether text is required instead of a Document. Defaults to false
+ */
+function getPage(url, queries={}, needText=false) {
+	return new Promise((resolve, reject) => {
+		let uri = `${url}?`
+		Object.entries(queries).forEach(pair => {
+			uri = `${uri}${pair[0]}=${pair[1]}&`
+		})
+		console.log(`my URI: ${uri}`)
+		fetch(uri)
+			.then(
+				response => response.text()
+			)
+			.then(
+				text => {
+					let parser = new DOMParser()
+					needText ? resolve(text) : resolve(parser.parseFromString(text))
+				}
+			)
+			.catch(
+				error => {
+					let parser = new DOMParser()
+					needText ? reject('') : reject(parser.parseFromString(''))
+				}
+			)
+	})
 }
