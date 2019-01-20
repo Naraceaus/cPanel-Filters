@@ -59,8 +59,8 @@ function analyseSite(domain, path, siteData) {
 		console.log('checking for neto')
 		getPage(url, {'ajax': 'y'})
 			.then(
-				page => {
-					isNetoResult(page.text);
+				text => {
+					isNetoResult(text);
 				}
 			)
 	}
@@ -70,7 +70,8 @@ function analyseSite(domain, path, siteData) {
 	 * @param {string} text - A string containing the result of getting a cpanel page 
 	 */
 	async function isNetoResult(text) {
-		if (!(text === "") && text.startsWith("NSD1;")) {
+		console.log(text == undefined);
+		if (text != undefined && !(text === "") && text.startsWith("NSD1;")) {
 			siteData.status = "CHECKING LOGIN";
 			isLoggedInResult(text);
 		} else {
@@ -113,7 +114,10 @@ function analyseSite(domain, path, siteData) {
 			.then(
 				text => {
 					let parser = new DOMParser()
-					let link = parser.parse(text).querySelector(selector);
+					let link = parser.parseFromString(text, "text/html").querySelector(selector);
+					console.log("parse link");
+					console.log(parser.parseFromString(text, "text/html"));
+					console.log(link);
 					link
 						? storeData(storedDomain, link.getAttribute('href'))
 						: storeData(storedDomain, "NO RESULTS")
@@ -121,6 +125,8 @@ function analyseSite(domain, path, siteData) {
 			)
 			.catch(
 				result => {
+					console.log('Error');
+					console.log(result);
 					storeData(storedDomain, "NO RESULTS");
 				}
 			)
@@ -137,8 +143,10 @@ function analyseSite(domain, path, siteData) {
 		getPage(url, queries)
 			.then(
 				result => {
+					console.log("chjecktheme ajax response");
+					console.log(result)
 					let parser = new DOMParser()
-					let options = [...parser.parse(result).querySelector("select[name='cfgval0']").children]
+					let options = [...parser.parseFromString(result, "text/html").querySelector("select[name='cfgval0']").children]
 					let themes = []
 					let livetheme = ""
 					options.forEach(option => {
@@ -154,6 +162,8 @@ function analyseSite(domain, path, siteData) {
 			)
 			.catch(
 				result => {
+					console.log("ERROR");
+					console.log(result);
 					siteData.livetheme = "N.A"
 					siteData.themes = ["N.A"]
 					storeData(domain, siteData)
