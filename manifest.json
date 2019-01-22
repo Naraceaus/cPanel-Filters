@@ -15,15 +15,23 @@
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["storage.js","pingbackground.js"]
+      "js": ["storage.js","pingbackground.js","contextfunctions/checkNView.js","contextfunctions/checkParentPage.js","contextfunctions/checkOrderPage.js"]
     },
 	{
+      "matches": ["*://*/_cpanel/products*"],
+      "js": ["cPanel/displayParentFields.js"]	
+	},
+	{
       "matches": ["*://*/_cpanel/order*"],
-      "js": ["cPanel/markorderlinesforshipping.js"]	
+      "js": ["cPanel/markorderlinesforshipping.js", "contextfunctions/markOrderlinesForShipping.js"]	
 	},
 	{
       "matches": ["*://*/_cpanel/ship"],
       "js": ["cPanel/shippingmatrix.js"]	
+	},
+	{
+      "matches": ["*://*/_cpanel/ship*"],
+      "js": ["contextfunctions/toggleShippingMethods.js"]	
 	},
 	{
       "matches": ["*://*/_cpanel/shippinggroup*"],

@@ -73,7 +73,7 @@ const helperUI = new Vue({
 		checkNView: function() {
 			var self = this;
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "check_nview"}, function(response) {
+				sendMessageToID(tabs[0].id, {target:"contextController", func: "checkNView"}, function(response) {
 					if (typeof(response) != "undefined") {
 						self.preview = response.preview;
 					}
@@ -83,7 +83,7 @@ const helperUI = new Vue({
 		checkOrderPage: function() {
 			var self = this;
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "check_order_page"}, function(response) {
+				sendMessageToID(tabs[0].id, {target:"contextController", func: "checkOrderPage"}, function(response) {
 					if (typeof(response) != "undefined") {
 						self.orderpage = response.orderpage;
 					}
@@ -98,19 +98,19 @@ const helperUI = new Vue({
 		},
 		markOrderlinesForShipping: function() {
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "mark_orderlines_for_shipping"});
+				sendMessageToID(tabs[0].id, {target:"contextController", func: "markOrderlinesForShipping"});
 			});			
 		},
 		toggleShippingMethods: function(state) {
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "toggle_shipping_methods", state: state});
+				sendMessageToID(tabs[0].id, {target:"contextController", func: "toggleShippingMethods", input:{state: state});
 			});			
 		},
 		checkParentPage: function() {
 			var self = this;
 			
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "check_parent_page"}, function(response) {
+				sendMessageToID(tabs[0].id, {target:"contextController" func: "checkParentPage"}, function(response) {
 					if (typeof(response) != "undefined") {
 						self.parentpage = response.parentpage;
 					}
@@ -119,7 +119,7 @@ const helperUI = new Vue({
 		},
 		displayHiddenParentFields: function() {
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "display_hidden_parent_fields"});
+				sendMessageToID(tabs[0].id, {target:"contextController", func:"displayHiddenParentFields"});
 			});	
 		}
 	},
