@@ -1,5 +1,16 @@
+import Vue from 'vue'
+import * as storage from '../../utils/storage'
 
-var helper_ui = new Vue({
+const {
+    getTabLocation, 
+    sendMessage,
+    changeLocation,
+    queryTabs,
+    changeLocation,
+    sendMessageToID,
+    retrieveData } = storage
+
+const helperUI = new Vue({
 	el: '#extension-wrapper',
 	data: {
 		sitedata: {
@@ -25,7 +36,7 @@ var helper_ui = new Vue({
 			}
 		},
 		forceRefresh: function() {
-			getTabLocation(function(loc) {
+		    getTabLocation(function(loc) {
 				sendMessage({
 					type:'analyse',
 					force_refresh: true,
@@ -36,13 +47,12 @@ var helper_ui = new Vue({
 		purgeCache: function(heavy) {
 			this.purgingcache = true;
 			getTabLocation(function(loc) {
-				sendMessage({
+			sendMessage({
 					type: 'purge_cache',
 					heavy: heavy,
 					loc:loc
 				}, function(response) {
 					this.purgingcache = false;
-					console.log(response)
 				});
 			})	
 		},
@@ -53,15 +63,10 @@ var helper_ui = new Vue({
 				if (/(^|&)nview={0,1}.*?($|&)/.test(new_query)) {
 					new_query = new_query.replace(/(^|&)nview={0,1}.*?($|&)/,"");
 				}
-				console.log('new_query after replace');
-				console.log(new_query);
-				
 				if (new_query.length > 0) {
 					new_query+="&"
 				}
 				new_query+="nview="+new_theme;
-				console.log("new url");
-				console.log(loc.domain, loc.path, new_query);
 				changeLocation(loc.id, "https://"+loc.domain+"/"+loc.path+"?"+new_query);
 			});
 		},
@@ -158,15 +163,11 @@ function getFailed(error) {
 function updatePopupWithData() {
 	getTabLocation(function(loc) {
 		retrieveData(loc.domain,function(stored_site_data) {
-			console.log('retrieved site date');
-			console.log(stored_site_data[loc.domain]);
 			if (stored_site_data[loc.domain] != null) {
 				helper_ui.sitedata = stored_site_data[loc.domain];
 				
 				retrieveData(loc.domain+"|"+loc.path,function(local_url) {
 					if (local_url != null) {
-						console.log('loaded local pagfe for ', loc.domain+"|"+loc.path);
-						console.log(local_url[loc.domain+"|"+loc.path]);
 						helper_ui.localpage = local_url[loc.domain+"|"+loc.path];
 					}
 				});
@@ -189,7 +190,4 @@ monitorStorage(function(changes) {
 			helper_ui.localpage = changes[loc.domain+"|"+loc.path].newValue;
 		}
 	})
-
-
-	
 });

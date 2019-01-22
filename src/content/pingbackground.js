@@ -9,6 +9,11 @@ sendMessage(domain_message);
 listenForMessages(listenForNViewRequests);
 
 function listenForNViewRequests(request, sender, sendResponse) {
+
+	if (request.type="content_request") {
+		this[request.function(request.input)]
+	}
+
 	if (request.type == "check_nview") {
 		var preview = "";
 		if (/(^|&|\?)nview={0,1}/.test(location.search)) {
@@ -34,8 +39,6 @@ function listenForNViewRequests(request, sender, sendResponse) {
 		display_parent_fields();
 	}
 }
-
-
 
 function mark_orderlines_for_shipping() {
 	var lines_to_ship = document.querySelectorAll("[id*=line-_rshq]");

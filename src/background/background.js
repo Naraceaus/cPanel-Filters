@@ -1,8 +1,13 @@
-monitorStorage(function(changes) {
-	
-});
+import * as storage from '../../utils/storage'
 
-listenForMessages(handleMessages);
+const {
+    getTabLocation, 
+    sendMessage,
+    changeLocation,
+    queryTabs,
+    changeLocation,
+    sendMessageToID,
+    retrieveData } = storage
 
 function handleMessages(message, sender, send_response) {
 	//loc specified then a content script hit a site
