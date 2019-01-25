@@ -1,16 +1,18 @@
-const ChromeExtensionReloader  = require('webpack-chrome-extension-reloader')
+const WebpackExtensionManifestPlugin = require( 'webpack-extension-manifest-plugin');
+const baseManifest = require( './manifest.json');
+const pkg = require('./package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const path = require('path');
 
 module.exports = {
     entry: {
-        'popup': './src/popup/index.js',
+        'popup': './src/content/popup/index.js',
         'background': './src/background/index.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: '/[name]/index.js'
+        filename: '[name]/index.js'
     },
     module: {
         rules: [
@@ -30,8 +32,14 @@ module.exports = {
         new CleanWebpackPlugin(['dist']),
         new HtmlWebpackPlugin({
             chunks: ['popup'],
-            template: './[name]/index.html',
-            filename: './[name]/index.html'
+            template: './src/content/popup/index.html',
+            filename: './popup/index.html'
+        }),
+        new WebpackExtensionManifestPlugin({
+            config: {
+                base: baseManifest,
+                extend: {version: pkg.version}
+            }
         })
     ]
   }

@@ -3,7 +3,8 @@
   "version": "6.4.0",
   "description": "Chrome addon used to generate Neto cPanel filters from the active tab",
   "scripts": {
-    "dev": "webpack --config webpack.config.js --mode=development --watch",
+    "build": "webpack --config webpack.prod.js",
+    "dev": "webpack --config webpack.dev.js --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,5 +19,18 @@
   "homepage": "https://github.com/Naraceaus/cPanel-Filters#readme",
   "dependencies": {
     "vue": "^2.5.22"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.5",
+    "clean-webpack-plugin": "^1.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.29.0",
+    "webpack-chrome-extension-reloader": "^1.1.2",
+    "webpack-cli": "^3.2.1",
+    "webpack-extension-manifest-plugin": "^0.4.3",
+    "webpack-merge": "^4.2.1"
   }
 }

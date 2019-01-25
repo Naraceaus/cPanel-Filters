@@ -3,7 +3,7 @@
   "description": "A series of small functions that make using the Neto cPanel simpler.",
   "manifest_version": 2,
   "name": "Neto Site Helper",
-  "version": "6.4",
+  "version": "6.41",
   "homepage_url": "https://github.com/Naraceaus/cPanel-Filters",
   "icons": {
     "256": "icons/icon.png"
@@ -78,14 +78,12 @@
 	}
   ],
   "browser_action": {
-	"default_popup":"popup/ui.html"
+	"default_popup":"popup/index.html"
   },
   "background": {
-	"page": "background/background-page.html"
+	"scripts": ["background/index.js"]
   },
   "permissions": [
-	"http://myapp.appspot.com/*",
-  "http://localhost/*",
 	"storage",
 	"tabs",
 	"*://*/*"

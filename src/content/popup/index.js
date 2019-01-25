@@ -1,14 +1,18 @@
-import Vue from 'vue'
+import Vue from 'vue/dist/vue.js'
 import * as storage from '../../utils/storage'
+
+console.log('sdfdsfds')
 
 const {
     getTabLocation, 
     sendMessage,
     changeLocation,
     queryTabs,
-    changeLocation,
     sendMessageToID,
-    retrieveData } = storage
+	retrieveData,
+	monitorStorage
+} = storage
+
 
 const helperUI = new Vue({
 	el: '#extension-wrapper',
@@ -103,14 +107,14 @@ const helperUI = new Vue({
 		},
 		toggleShippingMethods: function(state) {
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {target:"contextController", func: "toggleShippingMethods", input:{state: state});
+				sendMessageToID(tabs[0].id, {target:"contextController", func: "toggleShippingMethods", input:{state: state}});
 			});			
 		},
 		checkParentPage: function() {
 			var self = this;
 			
 			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {target:"contextController" func: "checkParentPage"}, function(response) {
+				sendMessageToID(tabs[0].id, {target:"contextController", func: "checkParentPage"}, function(response) {
 					if (typeof(response) != "undefined") {
 						self.parentpage = response.parentpage;
 					}
@@ -130,6 +134,7 @@ const helperUI = new Vue({
 		this.checkParentPage();
 	}
 })
+
 /*
 retrieveData('popupstes',getWorked,getFailed);
 
@@ -160,12 +165,14 @@ function getFailed(error) {
 
 
 // given an object containing site data, check the URL matches and update the UI to match
+
+
 function updatePopupWithData() {
 	getTabLocation(function(loc) {
+
 		retrieveData(loc.domain,function(stored_site_data) {
 			if (stored_site_data[loc.domain] != null) {
 				helper_ui.sitedata = stored_site_data[loc.domain];
-				
 				retrieveData(loc.domain+"|"+loc.path,function(local_url) {
 					if (local_url != null) {
 						helper_ui.localpage = local_url[loc.domain+"|"+loc.path];
@@ -177,7 +184,6 @@ function updatePopupWithData() {
 	});
 
 }
-
 updatePopupWithData();
 
 // whenever background updates the site data we need to update the UI (assuming the site url updated is the active tab)

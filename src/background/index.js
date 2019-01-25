@@ -1,11 +1,10 @@
-import * as storage from '../../utils/storage'
+import * as storage from '../utils/storage'
 
 const {
     getTabLocation, 
     sendMessage,
     changeLocation,
     queryTabs,
-    changeLocation,
     sendMessageToID,
     retrieveData } = storage
 
@@ -109,7 +108,7 @@ function analyseSite(domain, path, siteData) {
 	 * Finds the corresponding page in the control page for this webstore page and stores the result
 	 */
 	async function findPageInCPanel() {
-		let url = `${domain}/_cpanel/url`
+		let url = `${domain}/_cpanel/url`;
 		let queries = {
 			"_ftr_request_url": `^${truncated_path}`
 		}
