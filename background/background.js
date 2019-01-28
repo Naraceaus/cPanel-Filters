@@ -193,7 +193,7 @@ function purgeCache(message, send_response) {
 
 		if (message.heavy) {
 			let parser = new DOMParser()
-			let doc = parser.parse(response)
+			let doc = parser.parseFromString(response, "text/html")
 			var newCSSVersion = parseInt(doc.querySelector("[name='value']").value) + 1;
 			let token = doc.querySelector("[name='csrf_token']").value;
 			var body = {
