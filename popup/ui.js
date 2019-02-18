@@ -49,20 +49,9 @@ var helper_ui = new Vue({
 		changeTheme: function() {
 			var new_theme = this.preview;
 			getTabLocation(function(loc) {
-				var new_query = loc.query;
-				if (/(^|&)nview={0,1}.*?($|&)/.test(new_query)) {
-					new_query = new_query.replace(/(^|&)nview={0,1}.*?($|&)/,"");
-				}
-				console.log('new_query after replace');
-				console.log(new_query);
-				
-				if (new_query.length > 0) {
-					new_query+="&"
-				}
-				new_query+="nview="+new_theme;
-				console.log("new url");
-				console.log(loc.domain, loc.path, new_query);
-				changeLocation(loc.id, "https://"+loc.domain+"/"+loc.path+"?"+new_query);
+				let new_query = loc.query;
+				new_query.set('nview',new_theme);
+				changeLocation(loc.id, "https://"+loc.domain+loc.path+"?"+new_query);
 			});
 		},
 		checkNView: function() {
