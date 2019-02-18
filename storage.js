@@ -276,10 +276,7 @@ async function postPage(url, parameters={}) {
 		let uri = `https://${url}`
 		let opts = {
 			method: "POST",
-			body: new URLSearchParams(parameters),
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded"
-			}
+			body: new URLSearchParams(parameters)
 		}
 		fetch(uri, opts)
 			.then(
