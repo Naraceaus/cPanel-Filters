@@ -295,7 +295,7 @@ async function postPage(url, parameters={}) {
 }
 
 /**
- * Converts a JSON object into a form data string. Does not supported nested data.
+ * Converts a JSON object into a form data string. Does not support nested data.
  * @param {object} json the JSON object.
  * @returns {string} the encoded form data.
  */
