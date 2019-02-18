@@ -122,13 +122,15 @@ function changeLocation(tab_id, url) {
 }
 
 function extractDomain(full_url) {
-	return full_url.replace(/http.*\/\//,"").replace(/\/.*/,"").replace(/\?.*/,"");
+	return new URL(full_url).host;
 }
 function extractPath(full_url) {
-	return full_url.replace(/http.*\/\//,"").replace(/.*?(\/|$)/,"").replace(/\?.*/,"");
+	let path = new URL(full_url).pathname;
+	// remove the leading slash from the path
+	return path.substring(1);
 }
 function extractQueryString(full_url) {
-	return full_url.replace(/.*?(\?|$)/,"")
+	return new URL(full_url).searchParams;
 }
 
 function create_netosd_data(data, sp) {
