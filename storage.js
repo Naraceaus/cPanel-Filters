@@ -276,7 +276,7 @@ async function postPage(url, parameters={}) {
 		let uri = `https://${url}`
 		let opts = {
 			method: "POST",
-			body: JSON.stringify(parameters),
+			body: jsonToFormData(parameters),
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded"
 			}
@@ -293,3 +293,13 @@ async function postPage(url, parameters={}) {
 			)
 	})
 }
+
+/**
+ * Converts a JSON object into a form data string. Does not supported nested data.
+ * @param {object} json the JSON object.
+ * @returns {string} the encoded form data.
+ */
+const jsonToFormData = json =>
+  Object.keys(json)
+    .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(json[key]))
+    .join("&");
