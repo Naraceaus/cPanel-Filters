@@ -51,7 +51,7 @@ var helper_ui = new Vue({
 			getTabLocation(function(loc) {
 				let new_query = loc.query;
 				new_query.set('nview',new_theme);
-				changeLocation(loc.id, "https://"+loc.domain+loc.path+"?"+new_query);
+				changeLocation(loc.id, "https://"+loc.domain+"/"+loc.path+"?"+new_query);
 			});
 		},
 		checkNView: function() {
