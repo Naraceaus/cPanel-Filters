@@ -178,7 +178,7 @@ function analyseSite(domain, path, siteData) {
  */
 function purgeCache(message, send_response) {
 	// request css config to chcek current value
-	let url = `${message.loc.domain}/_cpanel/config/view`
+	let url = `${message.loc.domain}/_cpanel`
 	let queries = {
 		"id": "NETO_CSS_VERSION",
 		"mod": "main"
@@ -190,7 +190,8 @@ function purgeCache(message, send_response) {
 	
 	async function readCSSValue(response) {
 		let purge_cache_csrf_token = response.replace(/[\s\S]*csrfTokenSystemRefresh = '/,"").replace(/';[\s\S]*/,"");
-
+	
+		/* heavy no longer needed, mcc increments this every purge by default.
 		if (message.heavy) {
 			let parser = new DOMParser()
 			let doc = parser.parseFromString(response, "text/html")
@@ -212,6 +213,8 @@ function purgeCache(message, send_response) {
 		} else {
 			triggerPurgeCache(purge_cache_csrf_token);
 		}
+		*/
+		triggerPurgeCache(purge_cache_csrf_token);
 	}
 	
 	async function triggerPurgeCache(csrf_token) {
