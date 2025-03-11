@@ -1,8 +1,12 @@
-monitorStorage(function(changes) {
+import * as storage from '../storage.js';
+
+
+
+storage.monitorStorage(function(changes) {
 	
 });
 
-listenForMessages(handleMessages);
+storage.listenForMessages(handleMessages);
 
 function handleMessages(message, sender, send_response) {
 	//loc specified then a content script hit a site
@@ -17,7 +21,7 @@ function handleMessages(message, sender, send_response) {
 			} else {
 				// pull from loc storage the site info, if there is none initiate checks
 				//otherwise check the last updated timestamp and only initiate check if it's older than X
-				retrieveData(message.loc.domain,function(domain_data) {
+				storage.retrieveData(message.loc.domain,function(domain_data) {
 					analyseSite(message.loc.domain, message.loc.path, domain_data[message.loc.domain]);
 				});				
 			}
@@ -39,12 +43,13 @@ function analyseSite(domain, path, siteData) {
 			status:"CHECKING FOR NETO",
 			loggedin: false,
 			domain: domain,
+			truncated_path: truncated_path,
 			themes:['LOADING'],
 			livetheme:'LOADING',
 			last_checked: new Date().getTime()
 		};
 		
-		storeData(domain,siteData);
+		storage.storeData(domain,siteData);
 	}
 	// add timestamp check so only check login every X minutes
 	if (siteData.status != "NOT A NETO SITE") {
@@ -57,7 +62,7 @@ function analyseSite(domain, path, siteData) {
 	function checkIsNeto() {
 		let url = `${domain}/_cpanel`;
 		console.log('checking for neto')
-		getPage(url, {'ajax': 'y'})
+		storage.getPage(url, {'ajax': 'y'})
 			.then(
 				text => {
 					isNetoResult(text);
@@ -77,7 +82,7 @@ function analyseSite(domain, path, siteData) {
 		} else {
 			siteData.status = "NOT A NETO SITE";
 		}
-		storeData(domain,siteData);
+		storage.storeData(domain,siteData);
 	}
 
 	/**
@@ -85,91 +90,71 @@ function analyseSite(domain, path, siteData) {
 	 * @param {string} text - 
 	 */
 	async function isLoggedInResult(text) {
-		var response = parse_netosd_data(text)
+		var response = storage.parse_netosd_data(text)
 		if (response.error != null && response.error == "NOT_LOGGED_IN") {
 			siteData.status = "NOT LOGGED IN"
 			siteData.loggedin = true
+			storage.storeData(domain,siteData);
 		} else if (response.new_csrf_token != null) {
 			siteData.status = "LOGGED IN";
 			siteData.loggedin = true;
-			findPageInCPanel();
-			checkTheme();
+
+			//use offscreen cause I need domparser to analyse fetch results when looking for matching cpanl link/theme options
+			console.log('first document')
+			chrome.offscreen.createDocument({
+				url: 'background/page-searcher.html',
+				reasons: ['DOM_PARSER','LOCAL_STORAGE'],
+				justification: 'Checking available themes and finding matching Control Panel page for currently viewed Web Page',
+			})
+			.then(()=> {
+				console.log('sending find_page_in_cpanel message to first document')
+				storage.sendMessage({
+					type: 'find_page_in_cpanel',
+					site_data: siteData,
+					truncated_path: truncated_path
+				}, function(response) {
+					console.log('find_page_in_cpanel response');
+					console.log(response)
+					let storedURL = `${response.site_data.domain}|${response.truncated_path}`;
+					storage.storeData(storedURL, response.link);
+
+					chrome.offscreen.closeDocument()
+					.then(()=>{
+
+						console.log('second document')
+						//use offscreen cause I need domparser to analyse fetch results when looking for matching cpanl link/theme options
+						chrome.offscreen.createDocument({
+							url: 'background/page-searcher.html',
+							reasons: ['DOM_PARSER','LOCAL_STORAGE'],
+							justification: 'Checking available themes and finding matching Control Panel page for currently viewed Web Page',
+						})
+						.then(()=> {
+							storage.sendMessage({
+								type: 'check_theme',
+								site_data: siteData,
+							}, function(response) {
+								storage.storeData(response.site_data.domain, response.site_data);
+								chrome.offscreen.closeDocument();
+
+							});
+						})
+
+
+
+
+					})
+
+				});
+			}).catch((error)=>{console.log(error)});
+
 		} else {
 			siteData.status = "WOOPS SOMETHING BROKE";
+			storage.storeData(domain,siteData);
 		}
-		storeData(domain,siteData);			
+					
 	}
 	
-	/**
-	 * Finds the corresponding page in the control page for this webstore page and stores the result
-	 */
-	async function findPageInCPanel() {
-		let url = `${domain}/_cpanel/url`
-		let queries = {
-			"_ftr_request_url": `^${truncated_path}`
-		}
-		let selector = "#ajax-content-pl table tbody tr:first-of-type td:nth-of-type(2) a"
-		let storedDomain = `${domain}|${truncated_path}`
-		getPage(url, queries)
-			.then(
-				text => {
-					let parser = new DOMParser()
-					let link = parser.parseFromString(text, "text/html").querySelector(selector);
-					console.log("parse link");
-					console.log(parser.parseFromString(text, "text/html"));
-					console.log(link);
-					link
-						? storeData(storedDomain, link.getAttribute('href'))
-						: storeData(storedDomain, "NO RESULTS")
-				}
-			)
-			.catch(
-				result => {
-					console.log('Error');
-					console.log(result);
-					storeData(storedDomain, "NO RESULTS");
-				}
-			)
-	}
-	
-	/**
-	 * Checks the installed themes and finds the active theme and stores both results
-	 */
-	async function checkTheme() {
-		let url = `${domain}/_cpanel/setup_wizard`
-		let queries = {
-			"id": "webshopconfig"
-		}
-		getPage(url, queries)
-			.then(
-				result => {
-					console.log("chjecktheme ajax response");
-					console.log(result)
-					let parser = new DOMParser()
-					let options = [...parser.parseFromString(result, "text/html").querySelector("select[name='cfgval0']").children]
-					let themes = []
-					let livetheme = ""
-					options.forEach(option => {
-						themes.push(option.value)
-						option.selected
-							? livetheme = option.value
-							: null
-					})
-					siteData.livetheme = livetheme
-					siteData.themes = themes
-					storeData(domain, siteData)
-				}
-			)
-			.catch(
-				result => {
-					console.log("ERROR");
-					console.log(result);
-					siteData.livetheme = "N.A"
-					siteData.themes = ["N.A"]
-					storeData(domain, siteData)
-				}
-			)
-		}
+
 }
 /**
  * 
@@ -183,37 +168,13 @@ function purgeCache(message, send_response) {
 		"id": "NETO_CSS_VERSION",
 		"mod": "main"
 	}
-	getPage(url, queries)
+	storage.getPage(url, queries)
 		.then(
 			text => readCSSValue(text)
 		)
 	
 	async function readCSSValue(response) {
 		let purge_cache_csrf_token = response.replace(/[\s\S]*csrfTokenSystemRefresh = '/,"").replace(/';[\s\S]*/,"");
-	
-		/* heavy no longer needed, mcc increments this every purge by default.
-		if (message.heavy) {
-			let parser = new DOMParser()
-			let doc = parser.parseFromString(response, "text/html")
-			var newCSSVersion = parseInt(doc.querySelector("[name='value']").value) + 1;
-			let token = doc.querySelector("[name='csrf_token']").value;
-			var body = {
-				csrf_token: token,
-				item: 'config',
-				page: 'view',
-				action: 'edit',
-				mod: 'main',
-				id: 'NETO_CSS_VERSION',
-				value: newCSSVersion
-			}
-			postPage(url, body)
-				.then(
-					text => triggerPurgeCache(purge_cache_csrf_token)			
-				)
-		} else {
-			triggerPurgeCache(purge_cache_csrf_token);
-		}
-		*/
 		triggerPurgeCache(purge_cache_csrf_token);
 	}
 	
@@ -223,7 +184,7 @@ function purgeCache(message, send_response) {
 			ajaxfn: 'system_refresh',
 			ajax: 'y'
 		}
-		postPage(url, body)
+		storage.postPage(url, body)
 			.then(
 				text => {
 					if (typeof(browser) == 'undefined') {

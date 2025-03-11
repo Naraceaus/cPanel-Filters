@@ -1,21 +1,33 @@
 {
 
   "description": "A series of small functions that make using the Neto cPanel simpler.",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Neto Site Helper",
-  "version": "6.9",
+  "version": "7.0",
   "homepage_url": "https://github.com/Naraceaus/cPanel-Filters",
   "icons": {
     "256": "icons/icon.png"
   },
   
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "web_accessible_resources": [
+    {
+      "resources": [ "storage.js"],
+      "matches": [ "<all_urls>" ]
+    }
+  ],
 
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+
+  "sandbox": {
+	"pages": ["popup/ui.html"]
+ },
 
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["storage.js","pingbackground.js"]
+      "js": ["pingbackground.js"]
     },
 	{
       "matches": ["*://*/_cpanel/order*"],
@@ -69,17 +81,22 @@
 		"js": ["cPanel/urlfiltergeneration.js"]
 	}
   ],
-  "browser_action": {
-	"default_popup":"popup/ui.html"
+  "action": {
+	"default_popup":"popup/popup.html"
   },
   "background": {
-	"page": "background/background-page.html"
+    "service_worker": "background/background.js",
+    "type": "module"
   },
   "permissions": [
-	"http://myapp.appspot.com/*",
-  "http://localhost/*",
 	"storage",
 	"tabs",
-	"*://*/*"
+  "offscreen"
+  ],
+  "host_permissions": [
+	"http://localhost/*"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
   ]
 }

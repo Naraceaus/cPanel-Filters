@@ -1,4 +1,4 @@
-function storeData(key, value, success, error) {
+export function storeData(key, value, success, error) {
 	var item_set={};
 	item_set[key] = value;
 	if (typeof(browser) == 'undefined') {
@@ -9,7 +9,7 @@ function storeData(key, value, success, error) {
 	}
 }
 
-function retrieveData(keys,success,error) {
+export function retrieveData(keys,success,error) {
 	if (typeof(browser) == 'undefined') {
 		chrome.storage.local.get(keys,success)
 	} else {
@@ -18,7 +18,7 @@ function retrieveData(keys,success,error) {
 	}	
 }
 
-function monitorStorage(callback) {
+export function monitorStorage(callback) {
 	if (typeof(browser) == 'undefined') {
 		var browser = chrome;
 	}
@@ -27,7 +27,7 @@ function monitorStorage(callback) {
 }
 
 
-function sendMessage(data, proc_response) {
+export function sendMessage(data, proc_response) {
 	if (typeof(browser) == 'undefined') {
 		chrome.runtime.sendMessage(data, proc_response);
 	} else {
@@ -39,7 +39,7 @@ function sendMessage(data, proc_response) {
 	}
 }
 
-function sendMessageToID(id, data, proc_response) {
+export function sendMessageToID(id, data, proc_response) {
 	if (typeof(browser) == 'undefined') {
 		chrome.tabs.sendMessage(id, data, proc_response);
 	} else {
@@ -51,7 +51,7 @@ function sendMessageToID(id, data, proc_response) {
 	}
 }
 
-function listenForMessages(func) {
+export function listenForMessages(func) {
 	if (typeof(browser) == 'undefined') {
 		chrome.runtime.onMessage.addListener(func);
 	} else {
@@ -59,7 +59,7 @@ function listenForMessages(func) {
 	}
 }
 
-function queryTabs(filter, func) {
+export function queryTabs(filter, func) {
 	if (typeof(browser) == 'undefined') {
 		chrome.tabs.query(filter, func);
 	} else {
@@ -68,7 +68,7 @@ function queryTabs(filter, func) {
 }
 
 // retrieve active tab domain and run domain through callback
-function getTabLocation(callback) {
+export function getTabLocation(callback) {
 	if (typeof(browser) == 'undefined') {
 		chrome.tabs.query(
 			{
@@ -103,7 +103,7 @@ function getTabLocation(callback) {
 	}
 }
 
-function changeLocation(tab_id, url) {
+export function changeLocation(tab_id, url) {
 	if (typeof(browser) == 'undefined') {
 		chrome.tabs.update(
 			tab_id,
@@ -121,25 +121,25 @@ function changeLocation(tab_id, url) {
 	}
 }
 
-function extractDomain(full_url) {
+export function extractDomain(full_url) {
 	return new URL(full_url).host;
 }
-function extractPath(full_url) {
+export function extractPath(full_url) {
 	let path = new URL(full_url).pathname;
 	// remove the leading slash from the path
 	return path.substring(1);
 }
-function extractQueryString(full_url) {
+export function extractQueryString(full_url) {
 	return new URL(full_url).searchParams;
 }
 
-function create_netosd_data(data, sp) {
+export function create_netosd_data(data, sp) {
 	if (!sp) {
 		sp = '|';
 	}
 	return 'NSD1;' + create_netosd_data_rc(data, {}, sp);
 };
-function create_netosd_data_rc(data, vids, sp) {
+export function create_netosd_data_rc(data, vids, sp) {
 	var rtn = '';
 	if (data instanceof Array) {
 		rtn = '@';
@@ -165,7 +165,7 @@ function create_netosd_data_rc(data, vids, sp) {
 	}
 	return rtn;
 };
-function parse_netosd_data(data, sp) {
+export function parse_netosd_data(data, sp) {
 	if (!sp) {
 		sp = '|';
 	}
@@ -177,7 +177,7 @@ function parse_netosd_data(data, sp) {
 	}
 	return null;
 };
-function parse_netosd_data_rc(data, vds, sp) {
+export function parse_netosd_data_rc(data, vds, sp) {
 	if (!sp) {
 		sp = '|';
 	}
@@ -248,7 +248,7 @@ function parse_netosd_data_rc(data, vds, sp) {
  * @param {string} url 				- The URL to get the Document from 
  * @param {object} queries 			- An Object of key-value pairs of query parameters. Defaults to an empty object
  */
-async function getPage(url, queries={}, needDom=false) {
+export async function getPage(url, queries={}, needDom=false) {
 	return new Promise((resolve, reject) => {
 		let uri = `https://${url}?`
 		Object.entries(queries).forEach(pair => {
@@ -273,7 +273,7 @@ async function getPage(url, queries={}, needDom=false) {
  * @param {string} url 				- The URL to get the Document from 
  * @param {object} parameters 		- An Object of key-value pairs of query parameters. Defaults to an empty object
  */
-async function postPage(url, parameters={}) {
+export async function postPage(url, parameters={}) {
 	return new Promise((resolve, reject) => {
 		let uri = `https://${url}`
 		let opts = {

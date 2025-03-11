@@ -1,4 +1,3 @@
-
 var helper_ui = new Vue({
 	el: '#extension-wrapper',
 	data: {
@@ -12,100 +11,55 @@ var helper_ui = new Vue({
 		localpage: 'LOADING',
 		taburl: '',
 		purgingcache: false,
+		purgerequestedat: 0,
 		preview: '',
 		orderpage: false,
 		matrixpage: false,
 		parentpage: false
 	},
 	methods: {
+		updateField: function(key, value) {
+			this[key] = value;
+		},
 		openLink: function(url) {
-			if (typeof(browser) == 'undefined') {
-				chrome.tabs.create({url:url});
-			} else {
-				browser.tabs.create({url:url});
-			}
+			parent.postMessage({action:"open_link",url:url}, parentOrigin);
 		},
 		forceRefresh: function() {
-			getTabLocation(function(loc) {
-				sendMessage({
-					type:'analyse',
-					force_refresh: true,
-					loc:loc
-				});
-			})			
+			parent.postMessage({action:"force_refresh"}, parentOrigin);	
 		},
 		purgeCache: function(heavy) {
 			this.purgingcache = true;
-			getTabLocation(function(loc) {
-				sendMessage({
-					type: 'purge_cache',
-					heavy: heavy,
-					loc:loc
-				}, function(response) {
-					this.purgingcache = false;
-					console.log(response)
-				});
-			})	
+			this.purgerequestedat = Date.now();
+			parent.postMessage({action:"purge_cache", purgerequestedat:this.purgerequestedat}, parentOrigin);	
+		},
+		purgeComplete: function(purgerequestedat) {
+			if (this.purgerequestedat == purgerequestedat) {
+				this.purgingcache = false;
+			}
 		},
 		changeTheme: function() {
-			var new_theme = this.preview;
-			getTabLocation(function(loc) {
-				let new_query = loc.query;
-				new_query.set('nview',new_theme);
-				changeLocation(loc.id, "https://"+loc.domain+"/"+loc.path+"?"+new_query);
-			});
+			parent.postMessage({action:"change_theme",newtheme:this.preview}, parentOrigin);
 		},
 		checkNView: function() {
-			var self = this;
-			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "check_nview"}, function(response) {
-					if (typeof(response) != "undefined") {
-						self.preview = response.preview;
-					}
-				});
-			})
+			parent.postMessage({action:"check_nview"}, parentOrigin);
 		},
-		checkOrderPage: function() {
-			var self = this;
-			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "check_order_page"}, function(response) {
-					if (typeof(response) != "undefined") {
-						self.orderpage = response.orderpage;
-					}
-				});
-			})			
+		checkOrderPage: function() {			
+			parent.postMessage({action:"check_order_page"}, parentOrigin);
 		},
 		checkMatrixPage: function() {
-			var self = this;
-			queryTabs({active: true, currentWindow: true, url:"*://*/_cpanel/ship"}, function(tabs) {
-				self.matrixpage = tabs.length > 0;
-			})			
+			parent.postMessage({action:"check_matrix_page"}, parentOrigin);		
 		},
 		markOrderlinesForShipping: function() {
-			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "mark_orderlines_for_shipping"});
-			});			
+			parent.postMessage({action:"mark_orderlines_for_shipping"}, parentOrigin);
 		},
 		toggleShippingMethods: function(state) {
-			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "toggle_shipping_methods", state: state});
-			});			
+			parent.postMessage({action:"toggle_shipping_methods", state:state}, parentOrigin);
 		},
 		checkParentPage: function() {
-			var self = this;
-			
-			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "check_parent_page"}, function(response) {
-					if (typeof(response) != "undefined") {
-						self.parentpage = response.parentpage;
-					}
-				});
-			})			
+			parent.postMessage({action:"check_parent_page"}, parentOrigin);	
 		},
 		displayHiddenParentFields: function() {
-			queryTabs({active: true, currentWindow: true}, function(tabs) {
-				sendMessageToID(tabs[0].id, {type: "display_hidden_parent_fields"});
-			});	
+			parent.postMessage({action:"toggle_parent_fields"}, parentOrigin);
 		}
 	},
 	computed: {
@@ -406,18 +360,21 @@ var helper_ui = new Vue({
 		}
 	},
 	created: function() {
+// moving these to spot where we know the parent is ready for messages
+/*
 		this.checkNView();
 		this.checkOrderPage();
 		this.checkMatrixPage();
 		this.checkParentPage();
+*/
 	}
 })
 /*
-retrieveData('popupstes',getWorked,getFailed);
+storage.retrieveData('popupstes',getWorked,getFailed);
 
 function setWorked() {
 	console.log('set worked');
-	retrieveData('popupstes',getWorked,getFailed);
+	storage.retrieveData('popupstes',getWorked,getFailed);
 }
 
 function setFailed(error) {
@@ -440,45 +397,48 @@ function getFailed(error) {
 
 ////////////////////////////////////////////////////////////////
 
+//-------------- new listener for posted messages iframe
 
-// given an object containing site data, check the URL matches and update the UI to match
-function updatePopupWithData() {
-	getTabLocation(function(loc) {
-		helper_ui.taburl = loc.url;
-		retrieveData(loc.domain,function(stored_site_data) {
-			console.log('retrieved site date');
-			console.log(stored_site_data[loc.domain]);
-			if (stored_site_data[loc.domain] != null) {
-				helper_ui.sitedata = stored_site_data[loc.domain];
-				
-				retrieveData(loc.domain+"|"+loc.path,function(local_url) {
-					if (local_url != null) {
-						console.log('loaded local pagfe for ', loc.domain+"|"+loc.path);
-						console.log(local_url[loc.domain+"|"+loc.path]);
-						helper_ui.localpage = local_url[loc.domain+"|"+loc.path];
-					}
-				});
-				
-			}
-		});
-	});
-
+function sendResize() {
+	parent.postMessage({
+		action:"resize",
+		//the plus 16 is to account for the body elements default margin of 8 which apparently scrollHeight doesn't account for
+		height: document.body.scrollHeight + 16,
+		width: document.body.scrollWidth + 16
+	}, parentOrigin);
 }
 
-updatePopupWithData();
+var parentOrigin = '';
 
-// whenever background updates the site data we need to update the UI (assuming the site url updated is the active tab)
-monitorStorage(function(changes) {
-
-	getTabLocation(function(loc) {;
-		helper_ui.taburl = loc.url;
-		if (changes[loc.domain] != null) {
-			helper_ui.sitedata = changes[loc.domain].newValue;
-		} else if (changes[loc.domain+"|"+loc.path] != null) {
-			helper_ui.localpage = changes[loc.domain+"|"+loc.path].newValue;
-		}
-	})
-
-
+window.addEventListener('message', function (event) {
 	
+	switch (event.data.action) {
+		case 'hello':
+			console.log('parent said hello', event);
+			parentOrigin = event.origin;
+			console.log('posting update_popup_with_data on load');
+			sendResize();
+			parent.postMessage({action:"update_popup_with_data"}, parentOrigin);
+
+			helper_ui.checkNView();
+			helper_ui.checkOrderPage();
+			helper_ui.checkMatrixPage();
+			helper_ui.checkParentPage();
+
+		case 'update_field':
+			helper_ui.updateField(event.data.key, event.data.value);
+			setTimeout(sendResize, 50);
+			break;
+		case 'purge_complete':
+			helper_ui.purgeComplete(event.data.purgerequestedat);
+			setTimeout(sendResize, 50);
+			break;
+
+	}
 });
+
+
+
+
+
+
