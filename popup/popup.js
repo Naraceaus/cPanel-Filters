@@ -119,7 +119,7 @@ function updatePopupWithData(event) {
 			if (stored_site_data[loc.domain] != null) {
                 updateUI("sitedata", stored_site_data[loc.domain], event);
 				storage.retrieveData(loc.domain+"|"+loc.path,function(local_url) {
-					if (local_url != null) {
+					if (local_url != null && local_url[loc.domain+"|"+loc.path] != null) {
 						console.log('loaded local pagfe for ', loc.domain+"|"+loc.path);
 						console.log(local_url[loc.domain+"|"+loc.path]);
                         updateUI("localpage", local_url[loc.domain+"|"+loc.path], event);
